@@ -28,4 +28,4 @@ Pengelolaan menyediakan pengguna, kanal/tag, banner, halaman informasi dan penga
 
 Headline/Pilihan memilih ID artikel terbit dan urutan. Banner menggunakan rentang waktu WIB dan slot; jadwal aktif bertumpuk ditolak. Breaking news hilang otomatis saat akhir rentangnya. Statistik adalah perkiraan tampilan, bukan pembaca unik atau dasar penagihan.
 
-Editor visual menggunakan Tiptap dengan undo/redo, shortcut Ctrl+B/Ctrl+I/Ctrl+Z, penghitung kata dan estimasi baca. Caption/kredit dapat disisipkan sesudah gambar. Seleksi dan riwayat undo dikelola editor. Berkas Word/HTML yang ditempel tetap melalui sanitasi ketika disimpan. HTML yang tidak didukung tidak diterbitkan sebagai kode bebas.
+Editor visual menggunakan Quill dengan toolbar Snow bawaan dan undo/redo, shortcut Ctrl+B/Ctrl+I/Ctrl+Z, penghitung kata dan estimasi baca. Caption/kredit dapat disisipkan sesudah gambar. Seleksi dan riwayat undo dikelola editor. Berkas Word/HTML yang ditempel tetap melalui sanitasi ketika disimpan. HTML yang tidak didukung tidak diterbitkan sebagai kode bebas.

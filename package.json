@@ -3,11 +3,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
-        "@tiptap/extension-image": "^3.34.0",
-        "@tiptap/extension-placeholder": "^3.34.0",
-        "@tiptap/extension-youtube": "^3.34.0",
-        "@tiptap/react": "^3.34.0",
-        "@tiptap/starter-kit": "^3.34.0",
+        "quill": "2.0.2",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     },
