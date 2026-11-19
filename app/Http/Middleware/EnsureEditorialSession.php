@@ -20,6 +20,8 @@ class EnsureEditorialSession
             return redirect('/login');
         }
 
+        Auth::setUser($user);
+
         return $next($request)->header('Cache-Control', 'private, no-store')->header('X-Robots-Tag', 'noindex');
     }
 }

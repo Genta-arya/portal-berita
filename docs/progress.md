@@ -1,35 +1,31 @@
-# Progres implementasi
+# Progres implementasi — 19 November 2026
 
-Sumber kebutuhan: `prd.md` versi 1.0. Checkout utama: `D:\Project\portal-berita`.
+Sumber: PRD 1.0. Checkout utama `D:\Project\portal-berita`. Perubahan batch saat ini dikumpulkan sesuai arahan pengguna: tidak push per perubahan.
 
-## Tahap 0 — pemeriksaan awal
+## Implementasi lokal
 
-- [x] Skeleton Laravel yang sudah ada ditemukan dan dipertahankan.
-- [x] Dependensi Composer/npm dan kedua lockfile tersedia.
-- [x] Laravel CLI berjalan (12.73.0).
-- [x] `composer validate --no-check-publish` lulus.
-- [x] `npm run build` lulus.
-- [x] PRD terbaru disinkronkan ke checkout.
+- [x] Laravel/React/Vite, MySQL, migrasi dan lockfile.
+- [x] Login/logout, throttle, peran server, sesi akun nonaktif/berubah, admin terakhir, akun CLI.
+- [x] Artikel, editor visual React, autosave draft, konflik versi, sanitasi HTML, tag/kanal.
+- [x] Upload/media privat, varian WebP, pemilihan ulang, metadata dan referensi revisi.
+- [x] Review/revisi/persetujuan/jadwal/publikasi/penarikan, audit dan restore revisi.
+- [x] Preview privat, batas 404/410, canonical/redirect slug dan pencabutan media.
+- [x] Beranda, kanal, terbaru/filter, tag, profil, pencarian, artikel/terkait, halaman informasi.
+- [x] Headline/pilihan, breaking, banner rentang aktif/anti-overlap, statistik/deduplikasi.
+- [x] SEO/NewsArticle/RSS/sitemap, sharing, pengaturan, halaman error.
+- [x] Backup/restore, scheduler, pemulihan password CLI, panduan operasi/deployment.
+- [x] MySQL 8.4 terisolasi, migrasi, pengujian editorial/security/restore dan dataset 10.000 artikel.
+- [x] Pemeriksaan browser beranda/artikel pada 360 dan 1440 px tanpa overflow horizontal.
 
-## Tahap 1 — fondasi data (berjalan)
+## Gerbang peluncuran yang belum dapat dinyatakan selesai
 
-- [x] Migrasi identitas redaksi dibuat: role, active, slug, bio, session_version.
-- [ ] Migrasi model editorial lengkap.
-- [ ] Verifikasi migrasi pada MySQL terisolasi.
+- [ ] Staging provider, HTTPS, document root, cron nyata dan pencabutan akses melalui proxy hosting.
+- [ ] Lighthouse mobile >=80 dan uji 20 pembaca bersamaan selama 5 menit di staging berizin.
+- [ ] Pemeriksaan keyboard menyeluruh dan interaksi editor/autosave dalam browser oleh pengguna.
+- [ ] Restore backup sungguhan dari storage terpisah pada hosting target.
+- [ ] Nama/logo/domain, kontak, kebijakan, konten final dan persetujuan pemilik.
 
-## Tahap berikutnya
+Ini adalah implementasi lokal; jangan menyatakan situs produksi siap rilis sampai gerbang di atas terbukti. Hasil rinci ada di test-report.md. P1/P2 tidak diimplementasikan.
 
-Login/Policy/akun CLI; editor dan media privat; alur editorial; halaman publik; modul pendukung; QA dan panduan operasi. Seluruh tahap tersebut belum selesai. Jangan mengklaim MVP siap rilis.
-
-## Pembaruan login redaksi — 19 November 2026
-
-- Login/logout sesi dan pembatasan login tersedia.
-- Akun nonaktif dan versi sesi yang berubah kehilangan akses dashboard.
-- Perintah CLI `php artisan editorial:create-admin email nama` meminta password privat, tanpa akun bawaan.
-- Seeder tidak lagi membuat akun contoh.
-- Pengujian PHPUnit database SQLite terisolasi lulus: 5 test, 16 assertion. Ini belum membuktikan kompatibilitas MySQL.
-- Build Vite lulus. Hak akses per modul dan perlindungan admin terakhir masih perlu diimplementasikan.
-
-## Fondasi artikel
-
-Migrasi kanal, artikel, tag, revisi, catatan editorial dan audit tersedia. Policy artikel membatasi penulis ke kontennya sendiri dan melarang edit konten terbit. Scope publik mengecualikan draft, penarikan dan waktu terbit masa depan. PHPUnit terisolasi: 7 test, 22 assertion lulus. UI artikel, media dan workflow belum selesai.
+## Pengiriman repository
+Pengguna meminta push ke GitHub pada tindak lanjut terakhir. Implementasi lokal dikirim sebagai satu batch; gerbang peluncuran yang tercatat di atas tetap belum terverifikasi.

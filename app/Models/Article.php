@@ -12,7 +12,7 @@ class Article extends Model
 
     protected $attributes = ['status' => 'draft', 'version' => 1];
 
-    protected $guarded = ['id', 'status', 'author_id', 'editor_id', 'version', 'approved_version', 'published_at', 'scheduled_at', 'withdrawn_at'];
+    protected $fillable = ['title', 'slug', 'summary', 'body', 'category_id', 'hero_media_id', 'hero_alt', 'hero_caption', 'hero_credit', 'guest_author', 'seo_title', 'seo_description', 'sponsored'];
 
     protected function casts(): array
     {
@@ -24,9 +24,28 @@ class Article extends Model
         return $query->where('status', 'published')->whereNotNull('published_at')->where('published_at', '<=', now());
     }
 
-    public function author() { return $this->belongsTo(User::class, 'author_id'); }
-    public function category() { return $this->belongsTo(Category::class); }
-    public function tags() { return $this->belongsToMany(Tag::class); }
-    public function revisions() { return $this->hasMany(ArticleRevision::class); }
-    public function getUrlAttribute(): string { return url('/berita/'.$this->id.'/'.$this->slug); }
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class);
+    }
+
+    public function revisions()
+    {
+        return $this->hasMany(ArticleRevision::class);
+    }
+
+    public function getUrlAttribute(): string
+    {
+        return url('/berita/'.$this->id.'/'.$this->slug);
+    }
 }

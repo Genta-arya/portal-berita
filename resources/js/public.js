@@ -1,0 +1,4 @@
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => { try { await navigator.clipboard.writeText(b.dataset.copy); b.textContent = 'Tautan disalin'; } catch { window.prompt('Salin tautan berikut', b.dataset.copy); } }));
+const article=document.querySelector('[data-article-id]');
+document.querySelectorAll('.prose iframe').forEach(frame=>{const button=document.createElement('button');button.textContent='Muat video YouTube';button.type='button';button.addEventListener('click',()=>{frame.loading='lazy';frame.setAttribute('allowfullscreen','');button.replaceWith(frame);});frame.replaceWith(button);});
+if(article)fetch(`/berita/${article.dataset.articleId}/view`,{method:'POST',headers:{'X-CSRF-TOKEN':document.querySelector('meta[name=csrf-token]').content,'Accept':'application/json'},credentials:'same-origin'}).catch(()=>{});

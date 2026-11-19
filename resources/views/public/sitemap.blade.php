@@ -1,0 +1,2 @@
+{!! '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' !!}
+@if(!$page)<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">@for($i=1;$i<=max(1,$pages);$i++)<sitemap><loc>{{ url('/sitemap.xml?page='.$i) }}</loc></sitemap>@endfor</sitemapindex>@else<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">@foreach($articles as $a)<url><loc>{{ $a->url }}</loc><lastmod>{{ $a->updated_at->toIso8601String() }}</lastmod></url>@endforeach</urlset>@endif

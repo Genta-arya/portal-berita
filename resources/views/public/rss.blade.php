@@ -1,0 +1,2 @@
+{!! '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' !!}
+<rss version="2.0"><channel><title>{{ config('app.name') }}</title><link>{{ url('/') }}</link><description>Berita terbaru</description><language>id</language>@foreach($articles as $a)<item><title>{{ $a->title }}</title><link>{{ $a->url }}</link><guid isPermaLink="true">{{ $a->url }}</guid><description>{{ $a->summary }}</description><pubDate>{{ $a->published_at->toRssString() }}</pubDate></item>@endforeach</channel></rss>
