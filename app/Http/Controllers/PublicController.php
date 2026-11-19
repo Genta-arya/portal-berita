@@ -14,18 +14,14 @@ class PublicController extends Controller
 {
     public function home()
     {
-        $featured = Article::published()->whereIn('id', DB::table('featured_placements')->where('location', 'headline')->select('article_id'))->with('category')->get()->sortBy(fn ($a) => DB::table('featured_placements')->where('location', 'headline')->where('article_id', $a->id)->value('position'))->values();
-        if ($featured->isEmpty()) {
-            $featured = Article::published()->with('category')->latest('published_at')->latest('id')->limit(3)->get();
-        }
-        $featured = $featured->take(3);
-        $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
         $picks = Article::published()->with('category')->whereIn('id', DB::table('featured_placements')->where('location', 'pick')->select('article_id'))->limit(6)->get();
-        $popular = Article::published()->with('category')->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(6)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')->orderByDesc('total')->limit(5)->get(['articles.*']);
+        $popular = Article::published()->with('category')->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(6)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')->limit(5)->get(['articles.*', 'v.total']);
         $popularTitle = $popular->isEmpty() ? 'Terbaru' : 'Terpopuler';
         if ($popular->isEmpty()) {
             $popular = Article::published()->latest('published_at')->latest('id')->limit(5)->get();
         }
+        $featured = $popular->take(5);
+        $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
         $channels = Category::where('active', true)->with(['articles' => fn ($q) => $q->published()->latest('published_at')->limit(4)])->orderBy('position')->get()->filter(fn ($c) => $c->articles->isNotEmpty());
 
         return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels'));

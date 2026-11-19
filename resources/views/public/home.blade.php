@@ -8,11 +8,7 @@
 <div class="frontpage-grid">
 <div class="frontpage-main">
 @if($featured->isNotEmpty())
-<section class="lead-grid" aria-label="Sorotan utama">
-@php($lead = $featured->first())
-<article class="lead-story"><a class="story-image lead-image" href="{{ $lead->url }}">@if($lead->hero_media_id)<img src="/media/{{ $lead->hero_media_id }}/1280" alt="{{ $lead->hero_alt }}" width="1280" height="800" fetchpriority="high">@else<span class="image-fallback">{{ $lead->category?->name ?? 'Portal Berita' }}</span>@endif<span class="image-label">SOROTAN UTAMA</span></a><div class="story-meta"><a href="/kanal/{{ $lead->category?->slug }}">{{ $lead->category?->name }}</a><span>{{ $lead->published_at?->timezone('Asia/Jakarta')->format('H:i') }} WIB</span></div><h2><a href="{{ $lead->url }}">{{ $lead->title }}</a></h2><p>{{ $lead->summary }}</p></article>
-<div class="support-stories">@foreach($featured->skip(1) as $item)<article>@if($item->hero_media_id)<a class="story-image" href="{{ $item->url }}"><img src="/media/{{ $item->hero_media_id }}/480" alt="{{ $item->hero_alt }}" width="480" height="300" loading="lazy"></a>@endif<div class="story-meta"><a href="/kanal/{{ $item->category?->slug }}">{{ $item->category?->name }}</a></div><h2><a href="{{ $item->url }}">{{ $item->title }}</a></h2><time>{{ $item->published_at?->timezone('Asia/Jakarta')->format('H:i') }} WIB</time></article>@endforeach</div>
-</section>
+@include('public.headline-carousel')
 @else<section class="reader-empty"><span class="section-kicker">DARI RUANG REDAKSI</span><h2>Perspektif baru dimulai di sini.</h2><p>Redaksi sedang menyiapkan berita pertama.</p></section>@endif
 <section class="latest-section"><div class="reader-section-title"><h2>Berita terbaru</h2><a href="/terbaru">Lihat semua</a></div><div class="news-feed">@forelse($latest as $item)@include('public.card',['variant'=>'feed'])@if($loop->iteration===3)@include('public.banner',['slot'=>'list_middle'])@endif @empty<p class="reader-empty-note">Belum ada berita terbaru lainnya.</p>@endforelse</div><a class="all-news-link" href="/terbaru">Jelajahi semua berita</a></section>
 </div>
