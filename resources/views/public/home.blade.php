@@ -5,11 +5,7 @@
     @include('public.banner', ['slot' => 'home_top'])
 
     @if($channels->isNotEmpty())
-        <section class="topic-shelf" aria-labelledby="topics-heading">
-            <div class="section-bar">
-                <h2 id="topics-heading">Jelajahi kanal</h2>
-                <a href="/terbaru#filter-channel">Semua kanal</a>
-            </div>
+        <section class="topic-shelf" aria-label="Kategori berita">
             <ul class="topic-list">
                 @foreach($channels as $channel)
                     @php($image = $channel->articles->firstWhere('hero_media_id', '!=', null))
@@ -17,7 +13,7 @@
                         <a href="/kanal/{{ $channel->slug }}" class="topic-link">
                             <span class="topic-image" aria-hidden="true">
                                 @if($image)
-                                    <img src="/media/{{ $image->hero_media_id }}/480" alt="" width="120" height="72" loading="lazy">
+                                    <img src="/media/{{ $image->hero_media_id }}/480" alt="" width="80" height="80" loading="lazy">
                                 @else
                                     {{ mb_strtoupper(mb_substr($channel->name, 0, 2)) }}
                                 @endif
@@ -87,11 +83,11 @@
 
     @if($channels->isNotEmpty())
         <section class="channel-section" aria-labelledby="channels-heading">
-            <div class="section-bar"><h2 id="channels-heading">Berita per kanal</h2></div>
+            <div class="section-bar"><h2 id="channels-heading">Berita per kategori</h2></div>
             <div class="channel-sections">
                 @foreach($channels as $channel)
                     <section class="channel-block">
-                        <div class="channel-title"><h3><a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a></h3><a href="/kanal/{{ $channel->slug }}">Lihat kanal</a></div>
+                        <div class="channel-title"><h3><a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a></h3><a href="/kanal/{{ $channel->slug }}">Lihat semua</a></div>
                         @foreach($channel->articles as $item)@include('public.card', ['variant' => 'compact'])@endforeach
                     </section>
                 @endforeach

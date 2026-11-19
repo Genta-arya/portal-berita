@@ -12,9 +12,9 @@
             </header>
             @if(request()->is('terbaru'))
                 <form action="/terbaru" class="channel-filter">
-                    <label for="filter-channel">Pilih kanal</label>
+                    <label for="filter-channel">Pilih kategori</label>
                     <select id="filter-channel" name="category_id">
-                        <option value="">Semua kanal</option>
+                        <option value="">Semua kategori</option>
                         @foreach($filterCategories as $c)
                             <option value="{{ $c->id }}" @selected(request('category_id') == $c->id)>{{ $c->name }}</option>
                         @endforeach
