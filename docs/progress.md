@@ -29,3 +29,7 @@ Login/Policy/akun CLI; editor dan media privat; alur editorial; halaman publik; 
 - Seeder tidak lagi membuat akun contoh.
 - Pengujian PHPUnit database SQLite terisolasi lulus: 5 test, 16 assertion. Ini belum membuktikan kompatibilitas MySQL.
 - Build Vite lulus. Hak akses per modul dan perlindungan admin terakhir masih perlu diimplementasikan.
+
+## Fondasi artikel
+
+Migrasi kanal, artikel, tag, revisi, catatan editorial dan audit tersedia. Policy artikel membatasi penulis ke kontennya sendiri dan melarang edit konten terbit. Scope publik mengecualikan draft, penarikan dan waktu terbit masa depan. PHPUnit terisolasi: 7 test, 22 assertion lulus. UI artikel, media dan workflow belum selesai.
