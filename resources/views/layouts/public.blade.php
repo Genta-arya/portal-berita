@@ -39,7 +39,12 @@
         <nav class="reader-nav" aria-label="Navigasi utama">
             <a href="/" @if(request()->is('/')) aria-current="page" @endif>Beranda</a>
             <a href="/terbaru" @if(request()->is('terbaru')) aria-current="page" @endif>Terbaru</a>
-            @foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>@endforeach
+            @if($navigation->isNotEmpty())
+            <details class="category-dropdown" data-category-dropdown>
+                <summary>Kategori <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></summary>
+                <div class="category-popover"><div class="category-popover-heading"><strong>Jelajahi kategori</strong><span>Temukan kabar pilihan Anda</span></div><div class="category-options">@foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>@endforeach</div></div>
+            </details>
+            @endif
         </nav>
         <a class="nav-index" href="/terbaru">Indeks berita <span aria-hidden="true">☷</span></a>
     </div></div>

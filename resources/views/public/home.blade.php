@@ -1,9 +1,6 @@
 @extends('layouts.public')
 @section('content')
 @include('public.banner', ['slot'=>'home_top'])
-@if($channels->isNotEmpty())
-<div class="discovery-bar"><span class="discovery-label">JELAJAHI HARI INI</span><div>@foreach($channels->take(6) as $channel)<a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a>@endforeach</div><a class="discovery-all" href="/terbaru">Semua berita</a></div>
-@endif
 <div class="newsroom-heading"><div><span class="section-kicker">PILIHAN UNTUK ANDA</span><h1>Hari ini, lebih jernih<span>.</span></h1></div><p>Kabar terkini. Konteks yang berarti.</p></div>
 <div class="frontpage-grid">
 <div class="frontpage-main">
