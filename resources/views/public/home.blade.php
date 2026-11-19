@@ -1,16 +1,101 @@
 @extends('layouts.public')
+
 @section('content')
-@include('public.banner', ['slot'=>'home_top'])
-<div class="newsroom-heading"><div><span class="section-kicker">PILIHAN UNTUK ANDA</span><h1>Hari ini, lebih jernih<span>.</span></h1></div><p>Kabar terkini. Konteks yang berarti.</p></div>
-<div class="frontpage-grid">
-<div class="frontpage-main">
-@if($featured->isNotEmpty())
-@include('public.headline-carousel')
-@else<section class="reader-empty"><span class="section-kicker">DARI RUANG REDAKSI</span><h2>Perspektif baru dimulai di sini.</h2><p>Redaksi sedang menyiapkan berita pertama.</p></section>@endif
-<section class="latest-section"><div class="reader-section-title"><h2>Berita terbaru</h2><a href="/terbaru">Lihat semua</a></div><div class="news-feed">@forelse($latest as $item)@include('public.card',['variant'=>'feed'])@if($loop->iteration===3)@include('public.banner',['slot'=>'list_middle'])@endif @empty<p class="reader-empty-note">Belum ada berita terbaru lainnya.</p>@endforelse</div><a class="all-news-link" href="/terbaru">Jelajahi semua berita</a></section>
-</div>
-<aside class="frontpage-aside"><section class="popular-panel"><div class="reader-section-title"><h2>{{ $popularTitle }}</h2><span class="small-mark" aria-hidden="true">PB.</span></div><p class="panel-description">{{ $popularTitle==='Terpopuler'?'Paling banyak dibaca dalam tujuh hari terakhir.':'Ikuti kabar terbaru dari ruang redaksi.' }}</p><ol class="ranked-stories">@forelse($popular as $item)<li><span class="rank-number" aria-hidden="true">{{ str_pad($loop->iteration,2,'0',STR_PAD_LEFT) }}</span><div><a class="section-kicker" href="/kanal/{{ $item->category?->slug }}">{{ $item->category?->name }}</a><h3><a href="{{ $item->url }}">{{ $item->title }}</a></h3></div></li>@empty<li>Berita akan hadir di sini.</li>@endforelse</ol></section>@include('public.banner',['slot'=>'sidebar'])<section class="perspective-note"><span class="section-kicker">CARA KAMI BERCERITA</span><h2>Bukan sekadar kabar.<br>Juga sudut pandang.</h2><p>Kenali ruang redaksi di balik berita yang Anda baca.</p><a href="/halaman/pedoman-redaksi">Pedoman redaksi</a></section></aside>
-</div>
-@if($picks->isNotEmpty())<section class="editors-section"><div class="reader-section-title"><div><span class="section-kicker">LAYAK ANDA BACA</span><h2>Pilihan redaksi</h2></div><span class="editorial-flourish" aria-hidden="true">Pilihan.</span></div><div class="reader-card-grid">@foreach($picks as $item)@include('public.card',['variant'=>'tile'])@endforeach</div></section>@endif
-@if($channels->isNotEmpty())<section class="channel-section"><div class="reader-section-title"><h2>Beragam kabar, satu perspektif jernih.</h2></div><div class="channel-sections">@foreach($channels as $channel)<section class="channel-block"><div class="channel-title"><h3><a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a></h3><a href="/kanal/{{ $channel->slug }}">Lihat kanal</a></div>@foreach($channel->articles->take(3) as $item)@include('public.card',['variant'=>'compact'])@endforeach</section>@endforeach</div></section>@endif
+    <h1 class="sr-only">Beranda berita</h1>
+    @include('public.banner', ['slot' => 'home_top'])
+
+    @if($channels->isNotEmpty())
+        <section class="topic-shelf" aria-labelledby="topics-heading">
+            <div class="section-bar">
+                <h2 id="topics-heading">Jelajahi kanal</h2>
+                <a href="/terbaru#filter-channel">Semua kanal</a>
+            </div>
+            <ul class="topic-list">
+                @foreach($channels as $channel)
+                    @php($image = $channel->articles->firstWhere('hero_media_id', '!=', null))
+                    <li>
+                        <a href="/kanal/{{ $channel->slug }}" class="topic-link">
+                            <span class="topic-image" aria-hidden="true">
+                                @if($image)
+                                    <img src="/media/{{ $image->hero_media_id }}/480" alt="" width="120" height="72" loading="lazy">
+                                @else
+                                    {{ mb_strtoupper(mb_substr($channel->name, 0, 2)) }}
+                                @endif
+                            </span>
+                            <span>{{ $channel->name }}</span>
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
+    <div class="frontpage-grid">
+        @if($featured->isNotEmpty())
+            <section class="frontpage-hero" aria-labelledby="headline-heading">
+                <div class="section-bar"><h2 id="headline-heading">Sorotan hari ini</h2></div>
+                @include('public.headline-carousel')
+            </section>
+        @endif
+
+        @if($popularTitle === 'Terpopuler')
+            <aside class="frontpage-aside" aria-labelledby="popular-heading">
+                <div class="popular-panel">
+                    <div class="section-bar"><h2 id="popular-heading">Terpopuler</h2><span>7 hari terakhir</span></div>
+                    <ol class="ranked-stories">
+                        @foreach($popular as $item)
+                            <li>
+                                <span class="rank-number" aria-hidden="true">{{ $loop->iteration }}</span>
+                                <div>
+                                    @if($item->category)<a class="section-kicker" href="/kanal/{{ $item->category->slug }}">{{ $item->category->name }}</a>@endif
+                                    <h3><a href="{{ $item->url }}">{{ $item->title }}</a></h3>
+                                </div>
+                                @if($item->hero_media_id)
+                                    <a class="story-image" href="{{ $item->url }}"><img src="/media/{{ $item->hero_media_id }}/480" alt="{{ $item->hero_alt }}" width="80" height="64" loading="lazy"></a>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ol>
+                </div>
+                @include('public.banner', ['slot' => 'sidebar'])
+            </aside>
+        @else
+            <div class="frontpage-aside">@include('public.banner', ['slot' => 'sidebar'])</div>
+        @endif
+
+        <section class="latest-section" aria-labelledby="latest-heading">
+            <div class="section-bar"><h2 id="latest-heading">Berita terbaru</h2><a href="/terbaru">Lihat semua</a></div>
+            <div class="news-feed">
+                @forelse($latest as $item)
+                    @include('public.card', ['variant' => 'feed'])
+                    @if($loop->iteration === 3)@include('public.banner', ['slot' => 'list_middle'])@endif
+                @empty
+                    <p class="reader-empty-note">{{ $featured->isEmpty() ? 'Redaksi sedang menyiapkan berita pertama.' : 'Belum ada berita terbaru lainnya.' }}</p>
+                @endforelse
+            </div>
+        </section>
+    </div>
+
+    @if($picks->isNotEmpty())
+        <section class="editors-section" aria-labelledby="picks-heading">
+            <div class="section-bar"><h2 id="picks-heading">Pilihan redaksi</h2></div>
+            <div class="reader-card-grid">
+                @foreach($picks as $item)@include('public.card', ['variant' => 'tile'])@endforeach
+            </div>
+        </section>
+    @endif
+
+    @if($channels->isNotEmpty())
+        <section class="channel-section" aria-labelledby="channels-heading">
+            <div class="section-bar"><h2 id="channels-heading">Berita per kanal</h2></div>
+            <div class="channel-sections">
+                @foreach($channels as $channel)
+                    <section class="channel-block">
+                        <div class="channel-title"><h3><a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a></h3><a href="/kanal/{{ $channel->slug }}">Lihat kanal</a></div>
+                        @foreach($channel->articles as $item)@include('public.card', ['variant' => 'compact'])@endforeach
+                    </section>
+                @endforeach
+            </div>
+        </section>
+    @endif
 @endsection

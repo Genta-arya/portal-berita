@@ -18,7 +18,7 @@
 </head>
 <body class="reader">
 <a class="skip" href="#content">Lewati ke isi</a>
-<div class="edition-bar"><div class="wrap edition-inner"><span>{{ now()->locale('id')->timezone('Asia/Jakarta')->translatedFormat('l, d F Y') }} <span class="edition-zone">/ WIB</span></span><a href="/halaman/tentang">Independen dalam perspektif</a></div></div>
+<div class="edition-bar"><div class="wrap edition-inner">{{ now()->locale('id')->timezone('Asia/Jakarta')->translatedFormat('l, d F Y') }} <span class="edition-zone">WIB</span></div></div>
 @if($tickerArticles->isNotEmpty())
 <aside class="latest-ticker" aria-label="10 berita terbaru" data-latest-ticker><div class="wrap ticker-inner"><strong class="ticker-label">TERBARU</strong><div class="ticker-viewport"><div class="ticker-track"><ul class="ticker-items">@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}">{{ $tickerArticle->title }}</a></li>@endforeach</ul><ul class="ticker-items ticker-copy" aria-hidden="true" inert>@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}" tabindex="-1">{{ $tickerArticle->title }}</a></li>@endforeach</ul></div></div><button type="button" data-ticker-pause aria-label="Jeda berita berjalan" aria-pressed="false"><span aria-hidden="true">Ⅱ</span></button></div></aside>
 @endif
@@ -31,12 +31,12 @@
                 <span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i></span><span>{{ $settings['name'] ?? 'Portal Berita' }}<b>.</b></span>
             @endif
         </a>
-        <p class="brand-promise">Dekat dengan kabar.<br><strong>Jernih dalam membaca.</strong></p>
         <form action="/cari" class="reader-search" role="search">
             <label class="sr-only" for="search">Cari berita</label>
-            <input id="search" name="q" placeholder="Cari berita, temukan perspektif" value="{{ request('q') }}" maxlength="100">
+            <input id="search" name="q" placeholder="Cari berita atau topik" value="{{ is_string(request('q')) ? request('q') : '' }}" maxlength="100">
             <button aria-label="Cari berita" title="Cari berita"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
         </form>
+        <a class="masthead-latest" href="/terbaru">Indeks berita</a>
     </div>
     <div class="nav-band"><div class="wrap nav-inner">
         <nav class="reader-nav" aria-label="Navigasi utama">
@@ -45,11 +45,10 @@
             @if($navigation->isNotEmpty())
             <details class="category-dropdown" data-category-dropdown>
                 <summary>Kategori <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></summary>
-                <div class="category-popover"><div class="category-popover-heading"><strong>Jelajahi kategori</strong><span>Temukan kabar pilihan Anda</span></div><div class="category-options">@foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>@endforeach</div></div>
+                <div class="category-popover"><strong>Semua kategori</strong><div class="category-options">@foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>@endforeach</div></div>
             </details>
             @endif
         </nav>
-        <a class="nav-index" href="/terbaru">Indeks berita <span aria-hidden="true">☷</span></a>
     </div></div>
 </header>
 @if($breaking)
@@ -58,7 +57,7 @@
 <main id="content" class="wrap reader-main">@yield('content')</main>
 <footer class="reader-footer footer-compact">
     <div class="wrap footer-signoff">
-        <div><a class="reader-brand" href="/">{{ $settings['name'] ?? 'Portal Berita' }}<b>.</b></a><p>Dekat dengan kabar. Jernih dalam membaca.</p></div>
+        <a class="reader-brand" href="/">{{ $settings['name'] ?? 'Portal Berita' }}<b>.</b></a>
         <a class="footer-contact" href="/halaman/kontak">Hubungi redaksi</a>
     </div>
     <div class="wrap footer-info">

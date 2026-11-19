@@ -18,11 +18,15 @@ class PublicController extends Controller
         $popular = Article::published()->with('category')->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(6)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')->limit(5)->get(['articles.*', 'v.total']);
         $popularTitle = $popular->isEmpty() ? 'Terbaru' : 'Terpopuler';
         if ($popular->isEmpty()) {
-            $popular = Article::published()->latest('published_at')->latest('id')->limit(5)->get();
+            $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
         }
         $featured = $popular->take(5);
         $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
-        $channels = Category::where('active', true)->with(['articles' => fn ($q) => $q->published()->latest('published_at')->limit(4)])->orderBy('position')->get()->filter(fn ($c) => $c->articles->isNotEmpty());
+        $channels = Category::where('active', true)
+            ->whereHas('articles', fn ($query) => $query->published())
+            ->withCount(['articles' => fn ($query) => $query->published()])
+            ->with(['articles' => fn ($query) => $query->published()->latest('published_at')->latest('id')->limit(3)])
+            ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(6)->get();
 
         return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels'));
     }
@@ -66,7 +70,9 @@ class PublicController extends Controller
         }
         $articles = $q->latest('published_at')->latest('id')->paginate(20)->withQueryString();
 
-        return view('public.list', compact('articles', 'title', 'description'));
+        $filterCategories = $r->is('terbaru') ? Category::where('active', true)->orderBy('name')->get(['id', 'name']) : collect();
+
+        return view('public.list', compact('articles', 'title', 'description', 'filterCategories'));
     }
 
     public function article(Request $r, int $id, string $slug)
