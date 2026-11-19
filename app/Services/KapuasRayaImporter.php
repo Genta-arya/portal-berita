@@ -196,6 +196,8 @@ class KapuasRayaImporter
             }
         }
 
-        return $doc->saveHTML();
+        $wrapper = $doc->getElementsByTagName('div')->item(0);
+
+        return $wrapper ? implode('', array_map(fn ($node) => $doc->saveHTML($node), iterator_to_array($wrapper->childNodes))) : '';
     }
 }

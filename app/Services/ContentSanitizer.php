@@ -6,6 +6,11 @@ class ContentSanitizer
 {
     public function clean(string $html): string
     {
+        // DOMDocument's encoding hint is parser metadata, never article content.
+        $markers = ['<?xml encoding="utf-8"?>', '<?xml encoding="UTF-8"?>'];
+        foreach ($markers as $marker) {
+            $html = str_replace([$marker, htmlspecialchars($marker, ENT_NOQUOTES, 'UTF-8'), htmlspecialchars($marker, ENT_QUOTES, 'UTF-8')], '', $html);
+        }
         $config = \HTMLPurifier_Config::createDefault();
         $config->set('HTML.Allowed', 'p,br,h2,h3,strong,em,ul,ol,li,blockquote,a[href|title],img[src|alt|width|height],iframe[src|width|height|title]');
         $config->set('HTML.SafeIframe', true);
