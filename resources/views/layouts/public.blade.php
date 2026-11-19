@@ -48,13 +48,16 @@
 <div class="reader-breaking"><div class="wrap"><strong><span aria-hidden="true"></span> BREAKING NEWS</strong>@if($breaking->url)<a href="{{ $breaking->url }}">{{ $breaking->text }}</a>@else<span>{{ $breaking->text }}</span>@endif</div></div>
 @endif
 <main id="content" class="wrap reader-main">@yield('content')</main>
-<footer class="reader-footer">
-    <div class="wrap footer-top">
-        <div><a class="reader-brand footer-brand" href="/">{{ $settings['name'] ?? 'Portal Berita' }}<b>.</b></a><p>Informasi untuk memahami hari ini.<br>Perspektif untuk melihat lebih jauh.</p></div>
-        <div><h2>Jelajahi</h2><div class="footer-channels">@foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}">{{ $channel->name }}</a>@endforeach<a href="/terbaru">Berita terbaru</a><a href="/rss.xml">RSS</a></div></div>
-        <div><h2>Tentang redaksi</h2>@foreach(['tentang'=>'Tentang kami','kontak'=>'Hubungi kami','pedoman-redaksi'=>'Pedoman redaksi','koreksi'=>'Koreksi berita'] as $slug=>$label)<a href="/halaman/{{ $slug }}">{{ $label }}</a>@endforeach</div>
+<footer class="reader-footer footer-compact">
+    <div class="wrap footer-signoff">
+        <div><a class="reader-brand" href="/">{{ $settings['name'] ?? 'Portal Berita' }}<b>.</b></a><p>Dekat dengan kabar. Jernih dalam membaca.</p></div>
+        <a class="footer-contact" href="/halaman/kontak">Hubungi redaksi</a>
     </div>
-    <div class="wrap footer-bottom"><span>© {{ date('Y') }} {{ $settings['name'] ?? 'Portal Berita' }}. Seluruh hak cipta dilindungi.</span><div><a href="/halaman/privasi">Kebijakan privasi</a><a href="/login">Ruang redaksi</a>@if(!empty($settings['contact_email']))<a href="mailto:{{ $settings['contact_email'] }}">Email redaksi</a>@endif @if(!empty($settings['whatsapp']))<a href="https://wa.me/{{ $settings['whatsapp'] }}">WhatsApp</a>@endif @foreach(['facebook'=>'Facebook','x'=>'X'] as $key=>$label)@if(!empty($settings[$key]))<a href="{{ $settings[$key] }}" rel="noopener noreferrer">{{ $label }}</a>@endif @endforeach</div></div>
+    <div class="wrap footer-info">
+        <nav aria-label="Informasi media">@foreach(['tentang'=>'Tentang kami','pedoman-redaksi'=>'Pedoman redaksi','koreksi'=>'Koreksi berita','privasi'=>'Privasi'] as $slug=>$label)<a href="/halaman/{{ $slug }}">{{ $label }}</a>@endforeach</nav>
+        <div class="footer-social">@if(!empty($settings['whatsapp']))<a href="https://wa.me/{{ $settings['whatsapp'] }}">WhatsApp</a>@endif @foreach(['facebook'=>'Facebook','x'=>'X'] as $key=>$label)@if(!empty($settings[$key]))<a href="{{ $settings[$key] }}" rel="noopener noreferrer">{{ $label }}</a>@endif @endforeach</div>
+    </div>
+    <div class="wrap footer-legal"><span>© {{ date('Y') }} {{ $settings['name'] ?? 'Portal Berita' }}. Seluruh hak cipta dilindungi.</span><a href="/login">Ruang redaksi</a></div>
 </footer>
 @vite(['resources/js/public.js'])
 </body></html>
