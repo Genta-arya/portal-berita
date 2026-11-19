@@ -16,3 +16,7 @@ Lingkungan: Windows, PHP 8.3.16, Laravel 12.73, MySQL 8.4.3 di 127.0.0.1:3307. D
 ## Belum terverifikasi
 
 Lighthouse/Core Web Vitals, staging shared hosting, cron aktual per menit, SMTP provider, beban 20 pembaca/5 menit, aksesibilitas keyboard lengkap dan interaksi autosave browser. Angka performa lokal tidak menggantikan pengujian ini. Konfigurasi PHP CLI lokal masih memunculkan peringatan ionCube DLL, namun test/build berjalan.
+
+## Redesign dan import
+
+Pemeriksaan browser redesign: 360 px scrollWidth 345, 1440 px scrollWidth 1425; beranda dan navigasi ke indeks berhasil. Suite termasuk impor privat/idempoten: 18 test, 138 assertion lulus di MySQL. Kapuas Raya diarsipkan dari endpoint publik dan diverifikasi terhadap total API (76 artikel, 4 halaman, 74 kategori, 3 tag, 86 media, 91 gambar). Database lokal memuat 76 draft dan 91 referensi gambar sumber; rincian serta batasnya ada di kapuasraya-migration.md. Arsip privat dan ZIP tidak masuk Git.

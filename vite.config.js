@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/sage.css', 'resources/js/app.jsx', 'resources/js/editor.jsx', 'resources/js/public.js', 'resources/js/manage.js'],
+            input: ['resources/css/sage.css', 'resources/css/editorial.css', 'resources/js/app.jsx', 'resources/js/editor.jsx', 'resources/js/public.js', 'resources/js/manage.js'],
             refresh: true,
         }),
         tailwindcss(),

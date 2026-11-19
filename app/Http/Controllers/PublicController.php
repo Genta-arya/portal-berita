@@ -18,6 +18,7 @@ class PublicController extends Controller
         if ($featured->isEmpty()) {
             $featured = Article::published()->with('category')->latest('published_at')->latest('id')->limit(3)->get();
         }
+        $featured = $featured->take(3);
         $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
         $picks = Article::published()->with('category')->whereIn('id', DB::table('featured_placements')->where('location', 'pick')->select('article_id'))->limit(6)->get();
         $popular = Article::published()->with('category')->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(6)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')->orderByDesc('total')->limit(5)->get(['articles.*']);

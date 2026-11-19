@@ -29,3 +29,12 @@ Ini adalah implementasi lokal; jangan menyatakan situs produksi siap rilis sampa
 
 ## Pengiriman repository
 Pengguna meminta push ke GitHub pada tindak lanjut terakhir. Implementasi lokal dikirim sebagai satu batch; gerbang peluncuran yang tercatat di atas tetap belum terverifikasi.
+
+## Redesign pembaca dan arsip Kapuas Raya
+
+- Hierarki baru: header identitas, nav forest, jelajah kanal, headline bertingkat, feed terbaru, sidebar, blok kanal dan footer.
+- Beranda dan indeks diperiksa di browser pada 360/1440 px tanpa overflow halaman; navigasi indeks berfungsi. CSS pembaca terpisah dari dashboard.
+- Arsip publik Kapuas Raya: 76 artikel, 4 halaman, 74 kategori, 3 tag, 86 entri media, 91 gambar; raw archive + ZIP disimpan privat.
+- Verifikasi database lokal: 76 artikel impor berstatus draft, 4 halaman nonaktif, 91 gambar dipetakan. Akun WordPress tidak diambil (403).
+- Lihat docs/kapuasraya-migration.md. Konten belum dipublikasikan ulang; sumber/kredit/atribusi dan redirect produksi memerlukan review migrasi.
+- Suite diperbarui: 18 test, 138 assertion lulus di MySQL terisolasi; build Vite lulus.

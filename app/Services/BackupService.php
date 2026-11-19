@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class BackupService
 {
-    public const TABLES = ['users', 'categories', 'tags', 'media', 'articles', 'article_tag', 'article_revisions', 'editorial_notes', 'media_usages', 'featured_placements', 'breaking_news', 'ad_slots', 'ad_banners', 'pages', 'site_settings', 'article_view_daily', 'audit_logs'];
+    public const TABLES = ['users', 'categories', 'tags', 'media', 'articles', 'article_tag', 'article_revisions', 'editorial_notes', 'media_usages', 'featured_placements', 'breaking_news', 'ad_slots', 'ad_banners', 'pages', 'site_settings', 'article_view_daily', 'audit_logs', 'source_imports'];
 
     public function create(string $path): void
     {
