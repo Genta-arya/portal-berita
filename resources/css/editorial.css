@@ -98,15 +98,153 @@
 .reader :is(.latest-section, .popular-panel, .editors-section, .channel-block, .listing-panel, .reading) {
     background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
 }
-.reader .topic-shelf { padding: 6px 0; margin-bottom: 22px; }
-.reader .topic-list { display: flex; gap: 14px; overflow-x: auto; list-style: none; margin: 0; padding: 6px; scrollbar-width: thin; }
-.reader .topic-list li { flex: 1 0 102px; }
-.reader .topic-link { display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; text-align: center; font-size: 12px; font-weight: 700; text-transform: capitalize; }
-.reader .topic-image { display: grid; place-items: center; aspect-ratio: 1; width: 80px; border-radius: 50%; background: #dbe9e3; color: #15544e; overflow: hidden; }
-.reader .topic-image img { width: 100%; height: 100%; object-fit: cover; }
-@media (prefers-reduced-motion: no-preference) {
-    .reader .topic-image img { transition: transform 180ms ease; }
-    .reader .topic-link:is(:hover, :focus-visible) img { transform: scale(1.08); }
+.reader .topic-shelf {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(37, 51, 43, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+.reader .topic-shelf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--line);
+}
+.reader .topic-shelf-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.reader .topic-shelf-badge {
+    background: linear-gradient(135deg, #15544e, #2a7a72);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+.reader .topic-shelf-title h2 {
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: -0.2px;
+}
+.reader .topic-shelf-hint {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+}
+.reader .topic-shelf-scroller {
+    position: relative;
+    width: 100%;
+}
+.reader .topic-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 14px;
+    list-style: none;
+    margin: 0;
+    padding: 6px 2px;
+}
+.reader .topic-list li {
+    min-width: 0;
+    width: 100%;
+}
+.reader .topic-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    padding: 12px 10px;
+    background: #fbfcfb;
+    border: 1px solid #e7ede5;
+    border-radius: 12px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+.reader .topic-link:hover,
+.reader .topic-link:focus-visible {
+    background: #ffffff;
+    border-color: #15544e;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(21, 84, 78, 0.12);
+}
+.reader .topic-image-wrap {
+    padding: 3px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(21, 84, 78, 0.2), rgba(163, 177, 138, 0.4));
+    display: inline-flex;
+    transition: transform 0.2s ease;
+}
+.reader .topic-link:hover .topic-image-wrap {
+    background: linear-gradient(135deg, #15544e, #a3b18a);
+    transform: scale(1.05);
+}
+.reader .topic-image {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #eef4f1;
+    color: #15544e;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.reader .topic-initials {
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: #15544e;
+}
+.reader .topic-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.22s ease;
+}
+.reader .topic-link:hover .topic-image img {
+    transform: scale(1.1);
+}
+.reader .topic-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+}
+.reader .topic-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    transition: color 0.15s ease;
+}
+.reader .topic-link:hover .topic-name {
+    color: #15544e;
+}
+.reader .topic-count {
+    font-size: 10.5px;
+    color: var(--muted);
+    font-weight: 500;
 }
 .reader .frontpage-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(290px, 34%); grid-template-areas: 'hero aside' 'feed aside'; align-items: start; gap: 20px; }
 .reader .frontpage-hero { grid-area: hero; min-width: 0; }
@@ -244,10 +382,27 @@
     .reader .ticker-inner { gap: 8px; }
     .reader .ticker-label { padding-right: 7px; }
     .reader .reader-breaking > .wrap { flex-wrap: wrap; gap: 3px 9px; }
-    .reader .topic-shelf { padding: 4px 0; margin-bottom: 16px; }
-    .reader .topic-list { gap: 9px; }
-    .reader .topic-list li { flex-basis: 76px; }
-    .reader .topic-image { width: 60px; }
+    .reader .topic-shelf { padding: 12px 14px; margin-bottom: 18px; border-radius: 12px; }
+    .reader .topic-shelf-header { margin-bottom: 10px; }
+    .reader .topic-shelf-hint { display: none; }
+    .reader .topic-list {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 10px;
+        padding: 4px 1px 6px 1px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .reader .topic-list li {
+        flex: 0 0 auto;
+        width: 90px;
+        scroll-snap-align: start;
+    }
+    .reader .topic-link { padding: 10px 6px; border-radius: 10px; }
+    .reader .topic-image { width: 48px; height: 48px; }
+    .reader .topic-initials { font-size: 14px; }
+    .reader .topic-name { font-size: 12px; }
+    .reader .topic-count { font-size: 9.5px; }
     .reader .frontpage-grid, .reader .frontpage-grid:not(:has(.frontpage-hero)) {
         grid-template-columns: minmax(0, 1fr); grid-template-areas: 'hero' 'aside' 'feed'; gap: 15px;
     }

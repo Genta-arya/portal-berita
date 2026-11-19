@@ -6,30 +6,41 @@
 
     @if($channels->isNotEmpty())
         <section class="topic-shelf" aria-label="Kategori berita">
-            <ul class="topic-list">
-                @foreach($channels as $channel)
-                    @php($image = $channel->articles->firstWhere('hero_media_id', '!=', null))
-                    <li>
-                        <a href="/kanal/{{ $channel->slug }}" class="topic-link">
-                            <span class="topic-image" aria-hidden="true">
-                                @if($image)
-                                    <img src="/media/{{ $image->hero_media_id }}/480" alt="" width="80" height="80" loading="lazy">
-                                @else
-                                    {{ mb_strtoupper(mb_substr($channel->name, 0, 2)) }}
-                                @endif
-                            </span>
-                            <span>{{ $channel->name }}</span>
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
+            <div class="topic-shelf-header">
+                <div class="topic-shelf-title">
+                    <span class="topic-shelf-badge">Eksplor</span>
+                    <h2>Kategori Populer</h2>
+                </div>
+            </div>
+            <div class="topic-shelf-scroller">
+                <ul class="topic-list">
+                    @foreach($channels->take(10) as $channel)
+                        @php($image = $channel->articles->firstWhere('hero_media_id', '!=', null))
+                        <li>
+                            <a href="/kanal/{{ $channel->slug }}" class="topic-link">
+                                <span class="topic-image-wrap">
+                                    <span class="topic-image" aria-hidden="true">
+                                        @if($image)
+                                            <img src="/media/{{ $image->hero_media_id }}/480" alt="" width="80" height="80" loading="lazy">
+                                        @else
+                                            <span class="topic-initials">{{ mb_strtoupper(mb_substr($channel->name, 0, 2)) }}</span>
+                                        @endif
+                                    </span>
+                                </span>
+                                <span class="topic-meta">
+                                    <strong class="topic-name">{{ mb_strtoupper($channel->name) }}</strong>
+                                </span>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
         </section>
     @endif
 
     <div class="frontpage-grid">
         @if($featured->isNotEmpty())
-            <section class="frontpage-hero" aria-labelledby="headline-heading">
-                <div class="section-bar"><h2 id="headline-heading">Sorotan hari ini</h2></div>
+            <section class="frontpage-hero" aria-label="Sorotan utama">
                 @include('public.headline-carousel')
             </section>
         @endif
