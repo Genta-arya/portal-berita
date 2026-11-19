@@ -9,9 +9,8 @@
     @endforeach
     </div>
     <div class="carousel-controls" data-carousel-controls hidden>
-        <button type="button" data-prev aria-label="Berita sebelumnya">Sebelumnya</button>
-        <div class="carousel-dots">@foreach($featured->take(5) as $item)<button type="button" data-go="{{ $loop->index }}" aria-label="Tampilkan berita {{ $loop->iteration }}: {{ $item->title }}" aria-pressed="{{ $loop->first?'true':'false' }}"><span></span></button>@endforeach</div>
-        <button type="button" data-next aria-label="Berita berikutnya">Berikutnya</button>
+        <div class="carousel-pagination" aria-hidden="true">@foreach($featured->take(5) as $item)<span data-indicator class="{{ $loop->first?'is-active':'' }}"></span>@endforeach</div>
+        <button type="button" class="carousel-accessible-pause" data-autoplay-toggle aria-pressed="false">Jeda carousel otomatis</button>
     </div>
     <p class="sr-only" data-carousel-status aria-live="polite" aria-atomic="true">Berita 1 dari {{ $featured->count() }}</p>
     <noscript><div class="carousel-fallback">@foreach($featured->skip(1) as $item)<a href="{{ $item->url }}">{{ $item->title }}</a>@endforeach</div></noscript>
