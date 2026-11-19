@@ -2,14 +2,22 @@
     "$schema": "https://json.schemastore.org/package.json",
     "private": true,
     "type": "module",
-    "dependencies": { "react": "^19.0.0", "react-dom": "^19.0.0" },
+    "dependencies": {
+        "@tiptap/extension-image": "^3.34.0",
+        "@tiptap/extension-placeholder": "^3.34.0",
+        "@tiptap/extension-youtube": "^3.34.0",
+        "@tiptap/react": "^3.34.0",
+        "@tiptap/starter-kit": "^3.34.0",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
+    },
     "scripts": {
         "build": "vite build",
         "dev": "vite"
     },
     "devDependencies": {
-        "@vitejs/plugin-react": "^4.7.0",
         "@tailwindcss/vite": "^4.0.0",
+        "@vitejs/plugin-react": "^4.7.0",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",

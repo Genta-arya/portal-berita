@@ -19,6 +19,9 @@
 <body class="reader">
 <a class="skip" href="#content">Lewati ke isi</a>
 <div class="edition-bar"><div class="wrap edition-inner"><span>{{ now()->locale('id')->timezone('Asia/Jakarta')->translatedFormat('l, d F Y') }} <span class="edition-zone">/ WIB</span></span><a href="/halaman/tentang">Independen dalam perspektif</a></div></div>
+@if($tickerArticles->isNotEmpty())
+<aside class="latest-ticker" aria-label="10 berita terbaru" data-latest-ticker><div class="wrap ticker-inner"><strong class="ticker-label">TERBARU</strong><div class="ticker-viewport"><div class="ticker-track"><ul class="ticker-items">@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}">{{ $tickerArticle->title }}</a></li>@endforeach</ul><ul class="ticker-items ticker-copy" aria-hidden="true" inert>@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}" tabindex="-1">{{ $tickerArticle->title }}</a></li>@endforeach</ul></div></div><button type="button" data-ticker-pause aria-label="Jeda berita berjalan" aria-pressed="false"><span aria-hidden="true">Ⅱ</span></button></div></aside>
+@endif
 <header class="reader-header">
     <div class="wrap reader-masthead">
         <a class="reader-brand" href="/" aria-label="{{ $settings['name'] ?? 'Portal Berita' }} — Beranda">

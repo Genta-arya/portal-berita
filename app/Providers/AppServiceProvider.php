@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer(['layouts.public', 'layouts.admin'], function ($view) {
+            if ($view->name()==='layouts.public') {
+                $view->with('tickerArticles', \App\Models\Article::published()->latest('published_at')->latest('id')->limit(10)->get(['id','title','slug']));
+            }
             $view->with('navigation', Cache::remember('site:navigation', 60, fn () => Category::where('active', true)->orderBy('position')->get()));
             $view->with('settings', Cache::remember('site:settings', 60, fn () => DB::table('site_settings')->pluck('value', 'key')));
             $view->with('breaking', DB::table('breaking_news')->where('active', true)->where('starts_at', '<=', now())->where('ends_at', '>', now())->latest('id')->first());

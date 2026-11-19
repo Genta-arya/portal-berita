@@ -38,3 +38,9 @@ Pengguna meminta push ke GitHub pada tindak lanjut terakhir. Implementasi lokal 
 - Verifikasi database lokal: 76 artikel impor berstatus draft, 4 halaman nonaktif, 91 gambar dipetakan. Akun WordPress tidak diambil (403).
 - Lihat docs/kapuasraya-migration.md. Konten belum dipublikasikan ulang; sumber/kredit/atribusi dan redirect produksi memerlukan review migrasi.
 - Suite diperbarui: 18 test, 138 assertion lulus di MySQL terisolasi; build Vite lulus.
+
+## Editor jurnalis dan ticker terbaru
+
+Editor admin kini menggunakan Tiptap (React/ProseMirror), menggantikan document.execCommand. Tersedia format paragraf/H2/H3, tebal/miring, daftar, kutipan, tautan, gambar internal beserta caption, YouTube, undo/redo, hapus format, jumlah kata, estimasi baca dan shortcut. Penyimpanan tetap melalui service editorial, validasi versi dan sanitasi server. Video keluaran editor yang memakai query parameter YouTube diizinkan hanya pada host/id embed yang dibatasi.
+
+Ticker tepat di bawah tanggal mengambil maksimal 10 artikel terbit terbaru dengan urutan tanggal/id stabil. Posisi sticky, animasi berjalan, tombol jeda, pause saat hover/fokus, dan dukungan reduced-motion. Duplikasi visual untuk loop disembunyikan dari pembaca layar dan navigasi keyboard. Browser memverifikasi 10 tautan asli, tombol jeda, dan posisi ticker top=0 saat digulir. Editor diperiksa pada tab terpisah tanpa menyunting draft pengguna; Tiptap terpasang dan tidak ada error konsol.

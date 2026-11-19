@@ -90,3 +90,5 @@ if(categoryDropdown){
  categoryDropdown.addEventListener('keydown',event=>{if(event.key==='Escape'){categoryDropdown.open=false;categoryDropdown.querySelector('summary').focus();}});
  categoryDropdown.addEventListener('focusout',event=>{if(event.relatedTarget&&!categoryDropdown.contains(event.relatedTarget))categoryDropdown.open=false;});
 }
+const latestTicker=document.querySelector('[data-latest-ticker]');
+if(latestTicker){latestTicker.querySelector('[data-ticker-pause]').addEventListener('click',event=>{const paused=latestTicker.classList.toggle('is-paused');event.currentTarget.setAttribute('aria-pressed',String(paused));event.currentTarget.setAttribute('aria-label',paused?'Putar berita berjalan':'Jeda berita berjalan');event.currentTarget.querySelector('span').textContent=paused?'▷':'Ⅱ';});}
