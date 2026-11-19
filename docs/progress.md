@@ -48,3 +48,11 @@ Ticker tepat di bawah tanggal mengambil maksimal 10 artikel terbit terbaru denga
 ## Toolbar library Quill
 
 Atas permintaan pengguna untuk toolbar siap pakai, editor Tiptap/custom toolbar diganti dengan Quill Snow. Quill menangani editing, dropdown heading, format, list, link, image/video dan undo/redo. Integrasi media privat, caption, autosave dan konflik versi tetap memakai backend yang sama. Quill dipin 2.0.2; 2.0.3 ditolak karena advisory GHSA-v3m3-f69x-jf25 pada HTML export. Sanitasi HTML server tetap wajib. `npm audit --omit=dev` tidak melaporkan kerentanan pada dependency yang dipilih. Toolbar dan naskah lama diperiksa di browser pada tab terpisah tanpa menyimpan perubahan pada draft pengguna; tidak ada error konsol.
+
+## Editor gratis tanpa langganan
+
+Pilihan final pengguna adalah editor gratis tanpa ketergantungan lisensi komersial. Quill diganti Jodit Community 4.20.3, dipin exact version. Paket berlisensi MIT (diverifikasi LICENSE.txt paket); notice disertakan di public/vendor/jodit/LICENSE.txt. Tidak menggunakan Jodit Pro, API key, layanan cloud atau kuota bulanan. Lisensi versi terpasang memungkinkan penggunaan sesuai MIT tanpa batas waktu; tidak menjanjikan ketentuan semua versi masa depan.
+
+Toolbar native: paragraf/H2/H3/kutipan, bold/italic/underline/strikethrough, list, link, media privat, YouTube, tabel, hapus format, pencarian, fullscreen, preview dan source. Source memakai textarea lokal, tidak mengunduh Ace/CDN. Plugin file browser/upload generik dimatikan; media tetap melalui otorisasi aplikasi. Server sanitizer mendukung tabel dan format tambahan sambil menghapus script/event berbahaya.
+
+Browser memeriksa toolbar, isi draft lama, fullscreen lalu kembali normal, tanpa menyimpan perubahan pada draft pengguna. Tidak ada error konsol. Suite MySQL: 23 test, 162 assertion lulus; build produksi lulus; npm audit --omit=dev: 0 vulnerabilities. Editor yang lebih lengkap hanya dimuat di dashboard artikel, bukan halaman pembaca.

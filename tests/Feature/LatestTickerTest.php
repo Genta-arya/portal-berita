@@ -22,4 +22,13 @@ class LatestTickerTest extends TestCase
         $html=app(\App\Services\ContentSanitizer::class)->clean('<iframe src="https://www.youtube-nocookie.com/embed/abcdefghijk?controls=1&amp;rel=0" width="560" height="315"></iframe><iframe src="https://evil.test/embed/abcdefghijk"></iframe>');
         $this->assertStringContainsString('youtube-nocookie.com/embed/abcdefghijk',$html);$this->assertStringNotContainsString('evil.test',$html);
     }
+    public function test_free_editor_tables_keep_content_without_unsafe_attributes(): void
+    {
+        $html=app(\App\Services\ContentSanitizer::class)->clean('<p><u>Garis bawah</u> <s>Koreksi</s></p><table onclick="alert(1)"><tbody><tr><th>Wilayah</th><td>Kapuas</td></tr></tbody></table><script>alert(1)</script>');
+        $this->assertStringContainsString('<table>',$html);
+        $this->assertStringContainsString('<td>Kapuas</td>',$html);
+        $this->assertStringContainsString('<u>Garis bawah</u>',$html);
+        $this->assertStringNotContainsString('onclick',$html);
+        $this->assertStringNotContainsString('<script',$html);
+    }
 }

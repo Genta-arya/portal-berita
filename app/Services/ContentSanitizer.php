@@ -12,7 +12,7 @@ class ContentSanitizer
             $html = str_replace([$marker, htmlspecialchars($marker, ENT_NOQUOTES, 'UTF-8'), htmlspecialchars($marker, ENT_QUOTES, 'UTF-8')], '', $html);
         }
         $config = \HTMLPurifier_Config::createDefault();
-        $config->set('HTML.Allowed', 'p,br,h2,h3,strong,em,ul,ol,li,blockquote,a[href|title],img[src|alt|width|height],iframe[src|width|height|title]');
+        $config->set('HTML.Allowed', 'p,br,h2,h3,strong,em,u,s,ul,ol,li,blockquote,table,thead,tbody,tfoot,tr,th[colspan|rowspan|scope],td[colspan|rowspan],a[href|title],img[src|alt|width|height],iframe[src|width|height|title]');
         $config->set('HTML.SafeIframe', true);
         $config->set('URI.SafeIframeRegexp', '~^https://www.youtube-nocookie.com/embed/[A-Za-z0-9_-]{11}(?:\?[A-Za-z0-9_=&%\-]*)?$~D');
         $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true]);
