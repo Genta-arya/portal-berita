@@ -9,9 +9,17 @@ if (carousel) {
  const dots = [...carousel.querySelectorAll('[data-indicator]')];
  const status = carousel.querySelector('[data-carousel-status]');
  const pause = carousel.querySelector('[data-autoplay-toggle]');
+ const prevBtn = carousel.querySelector('[data-carousel-prev]');
+ const nextBtn = carousel.querySelector('[data-carousel-next]');
  const motion = matchMedia('(prefers-reduced-motion: reduce)');
  let index = 0, timer, settle, drag = null, suppressClick = false;
  let hovered = false, focused = false, inView = true, userPaused = false;
+ if (prevBtn) prevBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); go(index - 1); });
+ if (nextBtn) nextBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); go(index + 1); });
+ dots.forEach((dot, dotIndex) => {
+  dot.style.cursor = 'pointer';
+  dot.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); go(dotIndex); });
+ });
  if (slides.length > 1) {
   carousel.classList.add('carousel-enhanced');
   slides.forEach(slide => { slide.hidden = false; });
@@ -91,4 +99,120 @@ if(categoryDropdown){
  categoryDropdown.addEventListener('focusout',event=>{if(event.relatedTarget&&!categoryDropdown.contains(event.relatedTarget))categoryDropdown.open=false;});
 }
 const latestTicker=document.querySelector('[data-latest-ticker]');
-if(latestTicker){latestTicker.querySelector('[data-ticker-pause]').addEventListener('click',event=>{const paused=latestTicker.classList.toggle('is-paused');event.currentTarget.setAttribute('aria-pressed',String(paused));event.currentTarget.setAttribute('aria-label',paused?'Putar berita berjalan':'Jeda berita berjalan');event.currentTarget.querySelector('span').textContent=paused?'▷':'Ⅱ';});}
+if(latestTicker){
+    const tickerPause=latestTicker.querySelector('[data-ticker-pause]');
+    if(tickerPause){
+        tickerPause.addEventListener('click',event=>{
+            const paused=latestTicker.classList.toggle('is-paused');
+            event.currentTarget.setAttribute('aria-pressed',String(paused));
+            event.currentTarget.setAttribute('aria-label',paused?'Putar berita berjalan':'Jeda berita berjalan');
+            const iconSpan = event.currentTarget.querySelector('span');
+            if(iconSpan) iconSpan.textContent=paused?'▷':'Ⅱ';
+        });
+    }
+}
+
+// Dark & Light Mode Toggle Initialization
+(function initTheme() {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    if (!themeToggleBtn) return;
+
+    const syncThemeUI = (isDark) => {
+        themeToggleBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
+        themeToggleBtn.setAttribute('aria-label', isDark ? 'Ganti ke mode terang' : 'Ganti ke mode gelap');
+        const textLabel = themeToggleBtn.querySelector('[data-theme-label]');
+        if (textLabel) {
+            textLabel.textContent = isDark ? 'Mode Terang' : 'Mode Gelap';
+        }
+    };
+
+    const initialDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    syncThemeUI(initialDark);
+})();
+
+// Helper for horizontal drag-to-scroll swipe on tracks
+function enableDragScroll(track) {
+    if (!track) return;
+    let isDown = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let hasDragged = false;
+
+    track.addEventListener('mousedown', (e) => {
+        isDown = true;
+        hasDragged = false;
+        startX = e.pageX - track.offsetLeft;
+        scrollLeft = track.scrollLeft;
+        track.classList.add('is-dragging');
+    });
+
+    const stopDragging = () => {
+        if (!isDown) return;
+        isDown = false;
+        track.classList.remove('is-dragging');
+    };
+
+    track.addEventListener('mouseleave', stopDragging);
+    track.addEventListener('mouseup', stopDragging);
+
+    track.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - track.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        if (Math.abs(walk) > 6) {
+            hasDragged = true;
+        }
+        track.scrollLeft = scrollLeft - walk;
+    });
+
+    // Suppress link click if dragged
+    track.addEventListener('click', (e) => {
+        if (hasDragged) {
+            e.preventDefault();
+            e.stopPropagation();
+            hasDragged = false;
+        }
+    }, true);
+}
+
+// Topic Shelf Horizontal Swipe & Nav
+document.querySelectorAll('[data-topic-shelf]').forEach(shelf => {
+    const track = shelf.querySelector('[data-topic-track]');
+    const prevBtn = shelf.querySelector('[data-topic-prev]');
+    const nextBtn = shelf.querySelector('[data-topic-next]');
+    if (!track) return;
+    enableDragScroll(track);
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            track.scrollBy({ left: -260, behavior: 'smooth' });
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            track.scrollBy({ left: 260, behavior: 'smooth' });
+        });
+    }
+});
+
+// Flex Slider for Featured Category
+document.querySelectorAll('[data-flex-slider]').forEach(slider => {
+    const track = slider.querySelector('[data-flex-track]');
+    const prevBtn = slider.querySelector('[data-flex-prev]');
+    const nextBtn = slider.querySelector('[data-flex-next]');
+    if (!track) return;
+    enableDragScroll(track);
+    if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            track.scrollBy({ left: -340, behavior: 'smooth' });
+        });
+    }
+    if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            track.scrollBy({ left: 340, behavior: 'smooth' });
+        });
+    }
+});

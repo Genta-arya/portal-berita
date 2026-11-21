@@ -4,16 +4,20 @@ $site = 'https://kapuasraya.com'
 New-Item -ItemType Directory -Force -Path $ArchiveRoot | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $ArchiveRoot 'images') | Out-Null
 $manifest = [ordered]@{source=$site;captured_at=[DateTime]::UtcNow.ToString('o');counts=@{};files=@();errors=@()}
-foreach ($endpoint in @('posts','pages','categories','tags','media','users')) {
-    $all = @(); $page = 1; $expected = 0
+foreach ($endpoint in @('posts','pages','categories','tags','media')) {
+    $all = [System.Collections.Generic.List[object]]::new()
+    $page = 1; $expected = 0
     try {
         do {
-            $response = Invoke-WebRequest "$site/wp-json/wp/v2/${endpoint}?per_page=100&page=$page" -UseBasicParsing -TimeoutSec 45
-            $all += @($response.Content | ConvertFrom-Json)
-            $expected = [int]($response.Headers['X-WP-Total'] | Select-Object -First 1)
+            $response = Invoke-WebRequest "$site/wp-json/wp/v2/${endpoint}?per_page=20&page=$page" -UseBasicParsing -TimeoutSec 45
+            $items = $response.Content | ConvertFrom-Json
+            if (-not $items) { break }
+            $all.AddRange([object[]]$items)
+            $headerTotal = $response.Headers['X-WP-Total'] | Select-Object -First 1
+            if ($headerTotal) { $expected = [int]$headerTotal }
             $page++
-        } while ($all.Count -lt $expected)
-        ConvertTo-Json -InputObject @($all) -Depth 60 | Set-Content -LiteralPath (Join-Path $ArchiveRoot "$endpoint.json") -Encoding utf8
+        } while ($all.Count -lt $expected -and $page -le [Math]::Ceiling($expected / 20.0))
+        ConvertTo-Json -InputObject $all.ToArray() -Depth 60 | Set-Content -LiteralPath (Join-Path $ArchiveRoot "$endpoint.json") -Encoding utf8
         $manifest.counts[$endpoint] = @{expected=$expected;captured=$all.Count}
         Write-Output "$endpoint : $($all.Count)/$expected"
     } catch { $manifest.errors += @{resource=$endpoint;error=$_.Exception.Message} }
@@ -35,7 +39,10 @@ foreach($url in $urls) {
     try {
         $uri=[Uri]$url
         if($uri.Scheme -ne 'https' -or $uri.Host -notin @('kapuasraya.com','www.kapuasraya.com','img-s-msn-com.akamaized.net')) { throw 'Sumber di luar domain dilewati.' }
-        $sha=[System.Security.Cryptography.SHA256]::Create();$hash=[Convert]::ToHexString($sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($url))).ToLowerInvariant();$sha.Dispose()
+        $sha=[System.Security.Cryptography.SHA256]::Create()
+        $hashBytes = $sha.ComputeHash([Text.Encoding]::UTF8.GetBytes($url))
+        $hash = ([System.BitConverter]::ToString($hashBytes) -replace '-','').ToLowerInvariant()
+        $sha.Dispose()
         $relative="images/$hash.bin"; $path=Join-Path $ArchiveRoot $relative
         if(!(Test-Path $path)) { Invoke-WebRequest $url -OutFile $path -TimeoutSec 60 -MaximumRedirection 0 }
         $index += @{url=$url;file=$relative;bytes=(Get-Item -LiteralPath $path).Length;sha256=(Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()}

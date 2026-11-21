@@ -25,8 +25,8 @@ class PublicController extends Controller
         $channels = Category::where('active', true)
             ->whereHas('articles', fn ($query) => $query->published())
             ->withCount(['articles' => fn ($query) => $query->published()])
-            ->with(['articles' => fn ($query) => $query->published()->latest('published_at')->latest('id')->limit(3)])
-            ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(6)->get();
+            ->with(['articles' => fn ($query) => $query->published()->latest('published_at')->latest('id')->limit(8)])
+            ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(9)->get();
 
         return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels'));
     }
@@ -70,9 +70,25 @@ class PublicController extends Controller
         }
         $articles = $q->latest('published_at')->latest('id')->paginate(20)->withQueryString();
 
-        $filterCategories = $r->is('terbaru') ? Category::where('active', true)->orderBy('name')->get(['id', 'name']) : collect();
+        $filterCategories = collect();
+        $selectedCategory = null;
+        if ($r->is('terbaru')) {
+            $selectedCategoryId = (int) $r->input('category_id');
+            if ($selectedCategoryId > 0) {
+                $selectedCategory = Category::find($selectedCategoryId);
+            }
+            // Ambil kategori terpopuler/terbanyak memiliki artikel aktif (top 15) untuk pill cepat
+            $filterCategories = Cache::remember('site:filter_popular_categories', 300, function () {
+                return Category::where('active', true)
+                    ->withCount(['articles' => fn ($q) => $q->published()])
+                    ->orderByDesc('articles_count')
+                    ->orderBy('position')
+                    ->limit(15)
+                    ->get(['id', 'name', 'slug']);
+            });
+        }
 
-        return view('public.list', compact('articles', 'title', 'description', 'filterCategories'));
+        return view('public.list', compact('articles', 'title', 'description', 'filterCategories', 'selectedCategory'));
     }
 
     public function article(Request $r, int $id, string $slug)
@@ -107,10 +123,30 @@ class PublicController extends Controller
         return response()->noContent();
     }
 
+    public function searchCategories(Request $r)
+    {
+        $q = trim((string) $r->input('q', ''));
+        if (mb_strlen($q) < 1) {
+            return response()->json([]);
+        }
+
+        $categories = Category::where('active', true)
+            ->where('name', 'like', "%{$q}%")
+            ->orderBy('name')
+            ->limit(10)
+            ->get(['id', 'name', 'slug']);
+
+        return response()->json($categories);
+    }
+
     public function page(string $slug)
     {
         $page = DB::table('pages')->where('slug', $slug)->where('active', true)->first();
         abort_unless($page, 404);
+
+        if ($slug === 'tentang') {
+            return view('public.about', compact('page'));
+        }
 
         return view('public.page', compact('page'));
     }

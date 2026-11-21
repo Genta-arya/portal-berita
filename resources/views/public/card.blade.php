@@ -1,5 +1,14 @@
 <article class="reader-card reader-card--{{ $variant ?? 'tile' }} {{ !$item->hero_media_id?'reader-card--text':'' }}">
-    @if($item->hero_media_id)<a class="story-image" href="{{ $item->url }}"><img src="/media/{{ $item->hero_media_id }}/480" width="480" height="300" alt="{{ $item->hero_alt }}" loading="lazy"></a>@endif
+    @if($item->hero_media_id)
+        <a class="story-image {{ in_array(($variant ?? 'tile'), ['tile', 'large']) ? 'story-image--with-watermark' : '' }}" href="{{ $item->url }}">
+            <img src="/media/{{ $item->hero_media_id }}/480" width="480" height="300" alt="{{ $item->hero_alt }}" loading="lazy">
+            @if(in_array(($variant ?? 'tile'), ['tile', 'large']))
+                <span class="thumbnail-watermark" aria-hidden="true">
+                    <img src="/images/logo-kapuasraya.png" width="100" height="24" alt="KAPUAS RAYA">
+                </span>
+            @endif
+        </a>
+    @endif
     <div class="reader-card-body">
         <div class="story-meta"><a href="/kanal/{{ $item->category?->slug }}">{{ $item->category?->name }}</a>@if($item->sponsored)<span>Konten sponsor</span>@endif</div>
         <h3><a href="{{ $item->url }}">{{ $item->title }}</a></h3>

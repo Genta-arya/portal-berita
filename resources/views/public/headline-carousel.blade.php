@@ -1,4 +1,7 @@
 <section class="headline-carousel" data-headline-carousel role="region" aria-roledescription="carousel" aria-label="Headline {{ $popularTitle }}" tabindex="0">
+    <div class="carousel-corner-logo" aria-hidden="true" style="position: absolute; top: 0; left: 0; z-index: 10; background: #ffffff; padding: 7px 15px 7px 12px; border-radius: 0 0 12px 0; box-shadow: 0 3px 12px rgba(0, 0, 0, 0.22); display: flex; align-items: center; pointer-events: none;">
+        <img src="/images/logo-kapuasraya.png" width="150" height="34" alt="KAPUAS RAYA" style="height: 23px; width: auto; max-width: 130px; object-fit: contain; display: block;">
+    </div>
     <div class="carousel-slides">
         @foreach($featured->take(5) as $item)
             <article class="headline-slide" data-slide role="group" aria-roledescription="slide" aria-label="{{ $loop->iteration }} dari {{ $featured->count() }}" @if(!$loop->first) hidden @endif>

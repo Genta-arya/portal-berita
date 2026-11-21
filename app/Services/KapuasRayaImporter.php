@@ -104,7 +104,12 @@ class KapuasRayaImporter
 
     private function read(string $name): array
     {
-        return json_decode(file_get_contents($this->root.'/'.$name.'.json'), true, 512, JSON_THROW_ON_ERROR);
+        $raw = file_get_contents($this->root.'/'.$name.'.json');
+        if (str_starts_with($raw, "\xEF\xBB\xBF")) {
+            $raw = substr($raw, 3);
+        }
+
+        return json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
     }
 
     private function text(string $html): string
