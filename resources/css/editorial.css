@@ -249,10 +249,40 @@
 .reader .category-dropdown[open] summary svg { transform: rotate(180deg); }
 .reader .category-popover {
     position: absolute; top: calc(100% + 5px); left: 0; z-index: 30;
-    width: min(390px, calc(100vw - 32px)); padding: 16px; background: #fff;
+    width: min(390px, calc(100vw - 32px)); padding: 14px 16px; background: #fff;
     border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 16px 32px #17332d22;
 }
-.reader .category-popover strong { font-size: 14px; }
+.reader .category-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 4px;
+}
+.reader .category-popover strong { font-size: 14px; font-weight: 800; color: var(--ink); }
+.reader .category-popover-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: var(--wash, #f1f5f9);
+    color: var(--muted, #64748b);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    padding: 0;
+}
+.reader .category-popover-close:hover {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.reader .category-popover-close svg {
+    display: block;
+}
 .reader .category-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; max-height: min(310px, 45vh); overflow: auto; margin-top: 8px; }
 .reader .category-options a { display: block; padding: 8px; border-radius: 6px; font-size: 13px; text-transform: capitalize; overflow-wrap: anywhere; }
 .reader .category-options a:is(:hover, [aria-current=page]) { background: var(--wash); color: var(--forest); }
@@ -2741,6 +2771,20 @@ html.dark .reader .category-popover {
     border-color: #2e3a50;
     color: #f1f5f9;
     box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+}
+html[data-theme="dark"] .reader .category-popover-header,
+html.dark .reader .category-popover-header {
+    border-bottom-color: #2e3a50;
+}
+html[data-theme="dark"] .reader .category-popover-close,
+html.dark .reader .category-popover-close {
+    background: #243044;
+    color: #94a3b8;
+}
+html[data-theme="dark"] .reader .category-popover-close:hover,
+html.dark .reader .category-popover-close:hover {
+    background: #451a1a;
+    color: #f87171;
 }
 html[data-theme="dark"] .reader .category-options a,
 html.dark .reader .category-options a {

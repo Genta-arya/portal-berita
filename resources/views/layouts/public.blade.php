@@ -190,7 +190,22 @@
         @if($navigation->isNotEmpty())
         <details class="category-dropdown" data-category-dropdown>
             <summary>Topik <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m5 7 5 5 5-5"/></svg></summary>
-            <div class="category-popover"><strong>Semua topik</strong><div class="category-options">@foreach($navigation as $channel)<a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>@endforeach</div></div>
+            <div class="category-popover">
+                <div class="category-popover-header">
+                    <strong>Semua topik</strong>
+                    <button type="button" class="category-popover-close" data-category-close aria-label="Tutup menu topik" title="Tutup">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="category-options">
+                    @foreach($navigation as $channel)
+                        <a href="/kanal/{{ $channel->slug }}" @if(request()->is('kanal/'.$channel->slug)) aria-current="page" @endif>{{ $channel->name }}</a>
+                    @endforeach
+                </div>
+            </div>
         </details>
         @endif
         <a href="/halaman/tentang" @if(request()->is('halaman/tentang')) aria-current="page" @endif>Tentang Kami</a>

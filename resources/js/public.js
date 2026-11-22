@@ -99,6 +99,13 @@ if(categoryDropdown){
      categoryDropdown.open=false;
    }
  });
+ const categoryCloseBtn = categoryDropdown.querySelector('[data-category-close]');
+ if(categoryCloseBtn){
+   categoryCloseBtn.addEventListener('click',event=>{
+     event.stopPropagation();
+     categoryDropdown.open = false;
+   });
+ }
  categoryDropdown.addEventListener('keydown',event=>{if(event.key==='Escape'){categoryDropdown.open=false;categoryDropdown.querySelector('summary').focus();}});
 }
 const latestTicker=document.querySelector('[data-latest-ticker]');
