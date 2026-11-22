@@ -4957,3 +4957,148 @@ html.dark .kr-search-view-all-link {
     background: #1e293b;
     border-color: #334155;
 }
+
+/* Comments Section below Share */
+.kr-comments-section {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+.kr-comments-header {
+    margin-bottom: 14px;
+}
+.kr-comments-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 750;
+    color: var(--ink);
+}
+.kr-comments-title-wrap h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 750;
+    line-height: 1.2;
+    color: inherit;
+}
+.kr-comments-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+}
+.kr-comments-empty-card {
+    background: var(--surface-2, #f8fafc);
+    border: 1px dashed var(--line, #cbd5e1);
+    border-radius: 12px;
+    padding: 22px 18px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.kr-comments-empty-icon {
+    color: var(--muted, #94a3b8);
+    display: grid;
+    place-items: center;
+}
+.kr-comments-empty-text {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--muted, #64748b);
+    max-width: 420px;
+}
+.kr-comments-login-box {
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.kr-comments-login-prompt {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted, #64748b);
+}
+.kr-google-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+.kr-google-login-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.kr-google-login-btn:active {
+    transform: scale(0.98);
+}
+.kr-google-icon {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Dark mode for Comments */
+:root[data-theme='dark'] .kr-comments-empty-card,
+html[data-theme="dark"] .kr-comments-empty-card,
+html.dark .kr-comments-empty-card {
+    background: #141f2e;
+    border-color: #2e3a50;
+}
+:root[data-theme='dark'] .kr-comments-title-wrap,
+html[data-theme="dark"] .kr-comments-title-wrap,
+html.dark .kr-comments-title-wrap {
+    color: #f1f5f9;
+}
+:root[data-theme='dark'] .kr-google-login-btn,
+html[data-theme="dark"] .kr-google-login-btn,
+html.dark .kr-google-login-btn {
+    background: #1e293b;
+    color: #f1f5f9;
+    border-color: #475569;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+:root[data-theme='dark'] .kr-google-login-btn:hover,
+html[data-theme="dark"] .kr-google-login-btn:hover,
+html.dark .kr-google-login-btn:hover {
+    background: #27354a;
+    border-color: #64748b;
+}
+
+/* Mobile Gap Adjustment for Related Stories below Share */
+@media (max-width: 760px) {
+    .reader .reading {
+        padding: 16px 14px 20px 14px;
+        margin-bottom: 16px;
+    }
+    .kr-comments-section {
+        margin-top: 18px;
+        padding-top: 16px;
+    }
+    .kr-comments-empty-card {
+        padding: 18px 14px;
+        gap: 10px;
+    }
+    .reader .related-stories {
+        margin-top: 14px;
+    }
+    .reader .related-stories > .section-bar {
+        margin-bottom: 10px;
+    }
+    .reader .related-stories .channel-grid {
+        gap: 12px;
+    }
+}
