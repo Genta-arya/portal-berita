@@ -591,6 +591,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         setInterval(updateClock, 10000);
     })();
+
+    // Close category dropdown when clicking outside
+    (function initCategoryDropdown() {
+        var dropdown = document.querySelector('[data-category-dropdown]');
+        if (!dropdown) return;
+        document.addEventListener('click', function(e) {
+            if (dropdown.hasAttribute('open') && !dropdown.contains(e.target)) {
+                dropdown.removeAttribute('open');
+            }
+        });
+    })();
 });
 </script>
 @vite(['resources/js/public.js'])

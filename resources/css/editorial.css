@@ -2423,10 +2423,11 @@
 @media (max-width: 760px) {
     .reader .nav-inner {
         gap: 10px;
+        position: relative;
     }
     .reader .reader-nav {
         overflow-x: auto;
-        overflow-y: hidden;
+        overflow-y: visible;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
         flex: 1 1 auto;
@@ -2435,6 +2436,19 @@
     }
     .reader .reader-nav::-webkit-scrollbar {
         display: none;
+    }
+    .reader .category-dropdown {
+        position: static;
+    }
+    .reader .category-popover {
+        position: absolute;
+        top: 100%;
+        left: 10px;
+        right: 10px;
+        width: auto;
+        max-width: calc(100vw - 20px);
+        box-sizing: border-box;
+        z-index: 1050;
     }
     .reader .theme-toggle-btn {
         padding: 5px 9px 5px 7px;
