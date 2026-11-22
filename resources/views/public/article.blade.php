@@ -21,7 +21,7 @@
 <div class="article-layout-grid">
     {{-- KOLOM KIRI: Detail Artikel & Rekomendasi Baca Juga --}}
     <div class="article-main-col">
-        <article class="reading" @if(!isset($preview)) data-article-id="{{ $article->id }}" @endif>
+        <article class="reading" @if(!isset($preview)) data-article-id="{{ \App\Models\Article::hashId($article->id) }}" @endif>
             @isset($preview)
                 <p class="notice">Preview privat · {{ $article->status }}</p>
             @endisset

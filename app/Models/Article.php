@@ -44,8 +44,34 @@ class Article extends Model
         return $this->hasMany(ArticleRevision::class);
     }
 
+    public static function hashId(int $id): string
+    {
+        $salt = 0x5A3C9; // 369609
+        $val = ($id * 29) ^ $salt;
+        return base_convert($val, 10, 36);
+    }
+
+    public static function decodeHash(string|int $hash): ?int
+    {
+        if (is_numeric($hash)) {
+            return (int) $hash;
+        }
+        $salt = 0x5A3C9;
+        $val = base_convert($hash, 36, 10);
+        if (! is_numeric($val)) {
+            return null;
+        }
+        $val = (int) $val;
+        $unmasked = $val ^ $salt;
+        if ($unmasked % 29 !== 0) {
+            return null;
+        }
+
+        return (int) ($unmasked / 29);
+    }
+
     public function getUrlAttribute(): string
     {
-        return url('/berita/'.$this->id.'/'.$this->slug);
+        return url('/berita/'.static::hashId($this->id).'/'.$this->slug);
     }
 }

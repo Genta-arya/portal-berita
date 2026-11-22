@@ -148,16 +148,21 @@ class PublicController extends Controller
         return view('public.list', compact('articles', 'title', 'description', 'filterCategories', 'selectedCategory', 'trendingArticles', 'otherArticles'));
     }
 
-    public function article(Request $r, int $id, string $slug)
+    public function article(Request $r, string $id, string $slug)
     {
-        $article = Article::with(['author', 'category', 'tags'])->findOrFail($id);
+        $realId = Article::decodeHash($id);
+        if (! $realId) {
+            abort(404);
+        }
+
+        $article = Article::with(['author', 'category', 'tags'])->findOrFail($realId);
         if ($article->status !== 'published' || ! $article->published_at || $article->published_at->isFuture()) {
             abort($article->published_at ? 410 : 404);
         }
-        if ($slug !== $article->slug) {
+        if ($slug !== $article->slug || $id !== Article::hashId($article->id)) {
             return redirect($article->url, 301);
         }
-        $related = Article::published()->where('id', '!=', $id)->where(fn ($q) => $q->where('category_id', $article->category_id)->orWhereHas('tags', fn ($q) => $q->whereIn('tags.id', $article->tags->pluck('id'))))->latest('published_at')->limit(6)->get();
+        $related = Article::published()->where('id', '!=', $realId)->where(fn ($q) => $q->where('category_id', $article->category_id)->orWhereHas('tags', fn ($q) => $q->whereIn('tags.id', $article->tags->pluck('id'))))->latest('published_at')->limit(6)->get();
 
         // Ambil berita trending untuk sidebar detail artikel
         $trendingArticles = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
@@ -174,15 +179,20 @@ class PublicController extends Controller
         return view('public.article', compact('article', 'related', 'trendingArticles', 'otherArticles'));
     }
 
-    public function view(Request $r, int $id)
+    public function view(Request $r, string $id)
     {
-        $a = Article::published()->findOrFail($id);
+        $realId = Article::decodeHash($id);
+        if (! $realId) {
+            return response()->noContent();
+        }
+
+        $a = Article::published()->findOrFail($realId);
         if (! $r->user() && ! preg_match('/bot|crawler|spider|slurp/i', $r->userAgent() ?? '')) {
             try {
                 $key = 'view:'.hash('sha256', $r->session()->getId().':'.$a->id);
                 if (Cache::add($key, true, 1800)) {
-                    DB::table('article_view_daily')->insertOrIgnore(['article_id' => $id, 'date' => now()->timezone('Asia/Jakarta')->toDateString(), 'views' => 0]);
-                    DB::table('article_view_daily')->where('article_id', $id)->where('date', now()->timezone('Asia/Jakarta')->toDateString())->increment('views');
+                    DB::table('article_view_daily')->insertOrIgnore(['article_id' => $a->id, 'date' => now()->timezone('Asia/Jakarta')->toDateString(), 'views' => 0]);
+                    DB::table('article_view_daily')->where('article_id', $a->id)->where('date', now()->timezone('Asia/Jakarta')->toDateString())->increment('views');
                 }
             } catch (\Throwable $e) {
                 report($e);

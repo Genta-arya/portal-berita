@@ -145,7 +145,6 @@
     <div class="wrap edition-inner">
         <div class="edition-time">
             <span>{{ now()->locale('id')->timezone('Asia/Jakarta')->translatedFormat('l, d F Y') }}</span>
-            <span class="edition-separator">·</span>
             <span class="edition-clock" id="krLiveClock">{{ now()->timezone('Asia/Jakarta')->format('H:i') }}</span>
             <span class="edition-zone">WIB</span>
         </div>
