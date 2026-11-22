@@ -168,6 +168,7 @@
 
             <div class="prose" id="krArticleProse">{!! $renderedBody !!}</div>
 
+            @if($article->tags->isNotEmpty())
             <div class="tags kr-article-tags">
                 <span class="kr-tags-heading">
                     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -180,6 +181,7 @@
                     <a href="/tag/{{ $tag->slug }}" class="kr-tag-pill">#{{ $tag->name }}</a>
                 @endforeach
             </div>
+            @endif
 
             <div class="share">
                 <strong class="share-title">

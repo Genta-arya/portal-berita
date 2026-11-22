@@ -175,11 +175,11 @@
 <header class="reader-header">
     <div class="wrap reader-masthead">
         <a class="reader-brand" href="/" aria-label="{{ $settings['name'] ?? 'KAPUAS RAYA' }} — Beranda">
-            <img src="/images/logo-kapuasraya.png" width="200" height="46" alt="{{ $settings['name'] ?? 'KAPUAS RAYA' }}" style="height: 44px; width: auto; max-width: 260px; object-fit: contain;">
+            <img src="/images/logo-kapuasraya.png" width="160" height="38" alt="{{ $settings['name'] ?? 'KAPUAS RAYA' }}" style="height: 36px; width: auto; max-width: 190px; object-fit: contain;">
         </a>
         <div class="reader-search" role="button" tabindex="0" id="krSearchTrigger" aria-label="Buka pencarian berita" title="Cari berita (Klik untuk membuka)">
-            <span class="reader-search-placeholder">Cari berita, tokoh, atau topik...</span>
-            <button type="button" aria-label="Cari berita" tabindex="-1"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
+            <span class="reader-search-placeholder">Cari Berita...</span>
+            <button type="button" aria-label="Cari berita" tabindex="-1"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
         </div>
     </div>
 </header>

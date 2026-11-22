@@ -2576,11 +2576,11 @@ html.dark .kr-inline-related-arrow {
 @media (max-width: 760px) {
     .reader .wrap { padding-inline: 15px; }
     .reader .reader-main { padding-block: 15px 30px; }
-    .reader .reader-masthead { gap: 10px; min-height: 58px; flex-wrap: wrap; padding-block: 10px; }
-    .reader .reader-brand img { height: 38px; max-width: 190px; }
-    .reader .reader-search { margin-left: auto; flex-basis: 150px; }
-    .reader .reader-search input { font-size: 13px; padding-left: 10px; }
-    .reader .reader-search button { padding-inline: 9px; }
+    .reader .reader-masthead { gap: 12px; min-height: 52px; flex-wrap: nowrap; padding-block: 8px; }
+    .reader .reader-brand img { height: 32px; max-width: 145px; }
+    .reader .reader-search { margin-left: auto; flex: 1 1 auto; max-width: 220px; min-width: 110px; padding: 2px 4px 2px 12px; }
+    .reader .reader-search-placeholder { font-size: 12.5px; }
+    .reader .reader-search button { padding: 5px 8px; }
     .reader .masthead-latest { display: none; }
     .reader .category-dropdown { position: static; }
     .reader .ticker-inner { gap: 8px; }
