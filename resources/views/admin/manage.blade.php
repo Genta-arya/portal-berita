@@ -1,16 +1,43 @@
 @extends('layouts.admin')
-@section('content')<span class="eyebrow">Operasional redaksi</span><h1>{{ ['users'=>'Pengguna','categories'=>'Kanal','tags'=>'Tag','pages'=>'Halaman informasi','settings'=>'Pengaturan situs','banners'=>'Banner iklan','breaking'=>'Breaking news','featured'=>'Headline dan pilihan','audit'=>'Audit aktivitas'][$module] }}</h1>
-@if($module!=='audit')<form id="management-form" class="panel" method="post">@csrf
-@if($module!=='settings')<label>ID untuk mengubah (kosongkan untuk membuat)<input name="id" type="number" min="1" value="{{ old('id') }}"></label>@endif
-@if(in_array($module,['users','categories','tags','settings']))<label>Nama<input name="name" required value="{{ old('name',$module==='settings'?($settings['name'] ?? ''):'') }}"></label>@endif
-@if(in_array($module,['categories','tags','pages']))<label>Slug<input name="slug" required value="{{ old('slug') }}"></label>@endif
-@if($module==='categories')<label>Deskripsi<textarea name="description">{{ old('description') }}</textarea></label><label>Urutan<input name="position" type="number" min="0" value="{{ old('position',0) }}"></label>@endif
-@if($module==='users')<label>Email<input name="email" type="email" required value="{{ old('email') }}"></label><label>Peran<select name="role">@foreach(['penulis','editor','admin'] as $role)<option>{{ $role }}</option>@endforeach</select></label><label>Password (minimal 12 karakter; kosongkan saat edit untuk mempertahankan)<input name="password" type="password" autocomplete="new-password" minlength="12"></label><label>Bio<textarea name="bio">{{ old('bio') }}</textarea></label>@endif
-@if($module==='pages')<label>Judul<input name="title" required value="{{ old('title') }}"></label><label>Isi HTML sederhana<textarea name="body" rows="12" required>{{ old('body') }}</textarea></label>@endif
-@if($module==='settings')@foreach(['description'=>'Deskripsi situs','contact_email'=>'Email kontak','whatsapp'=>'WhatsApp (angka internasional)','facebook'=>'URL Facebook','x'=>'URL X','logo_media_id'=>'ID media logo','favicon_media_id'=>'ID media favicon'] as $key=>$label)<label>{{ $label }}<input name="{{ $key }}" value="{{ old($key,$settings[$key] ?? '') }}"></label>@endforeach @endif
-@if($module==='featured')<label>ID artikel terbit<input name="article_id" type="number" required></label><label>Lokasi<select name="location"><option value="headline">Headline</option><option value="pick">Pilihan redaksi</option></select></label><label>Urutan<input name="position" type="number" min="1" max="20" required></label>@endif
-@if(in_array($module,['banners','breaking']))@if($module==='banners')<label>Slot<select name="slot">@foreach(['home_top','list_middle','sidebar','article_bottom'] as $slot)<option>{{ $slot }}</option>@endforeach</select></label><label>ID media<input name="media_id" type="number" required></label><label>Alt<input name="alt" required></label>@else<label>Teks<input name="text" required maxlength="255"></label>@endif<label>URL tujuan HTTP/HTTPS<input name="url" type="url" @required($module==='banners')></label><label>Mulai (WIB)<input name="starts_at" type="datetime-local" required></label><label>Berakhir (WIB)<input name="ends_at" type="datetime-local" required></label>@endif
-@if(!in_array($module,['settings','featured']))<label>Status<select name="active"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></label>@endif<button>Simpan</button></form>@endif
-<h2>Data tersimpan</h2><p>Maksimal 100 data terbaru. Gunakan ID pada formulir untuk mengubah data yang ada.</p><div class="table-wrap"><table><thead><tr><th>ID</th><th>Detail</th>@if(in_array($module,['categories','tags','pages','banners','breaking','featured']))<th>Aksi</th>@endif</tr></thead><tbody>@forelse($rows as $row)<tr><td>{{ $row->id ?? $row->key }} @if(!in_array($module,['audit','settings']))<button type="button" data-edit-row="{{ json_encode(collect((array)$row)->except(['password','remember_token','session_version'])->all()) }}">Edit</button>@endif</td><td><dl>@foreach((array)$row as $key=>$value)@if(!in_array($key,['password','remember_token','email_verified_at','session_version']))<dt>{{ $key }}</dt><dd>{{ \Illuminate\Support\Str::limit((string)$value,400) }}</dd>@endif @endforeach</dl></td>@if(in_array($module,['categories','tags','pages','banners','breaking','featured']))<td><form method="post" action="/admin/manage/{{ $module }}/{{ $row->id }}">@csrf @method('DELETE')<button class="danger">Hapus</button></form></td>@endif</tr>@empty<tr><td>Belum ada data.</td></tr>@endforelse</tbody></table></div>@endsection
-
+@php
+$modules = [
+    'pages'=>['Halaman','Kelola halaman informasi, profil, dan kebijakan portal.','Tambah halaman','pages'],
+    'categories'=>['Topik','Susun topik agar pembaca mudah menemukan berita.','Tambah topik','categories'],
+    'tags'=>['Tag','Hubungkan berita dengan kata kunci yang relevan.','Tambah tag','tags'],
+    'users'=>['Pengguna','Kelola tim, peran, dan akses ruang redaksi.','Tambah pengguna','users'],
+    'trending'=>['Trending Topik','Pilih topik dan urutannya untuk deretan story di beranda. Maksimal 9 topik aktif ditampilkan.','Tambah topik trending','categories'],
+    'featured'=>['Headline & pilihan','Kurasi berita utama dan pilihan redaksi di beranda.','Tambah pilihan','star'],
+    'breaking'=>['Breaking news','Atur kabar penting yang tampil pada ticker berita.','Tambah kabar','bolt'],
+    'banners'=>['Iklan','Kelola materi iklan, penempatan, dan jadwal penayangan.','Tambah iklan','banners'],
+    'settings'=>['Pengaturan','Identitas portal, kontak, dan kanal media sosial.','Simpan pengaturan','settings'],
+    'audit'=>['Audit aktivitas','Telusuri perubahan dan aktivitas tim redaksi.','','audit'],
+];
+[$title,$description,$createLabel,$icon] = $modules[$module];
+$canDelete = in_array($module,['categories','tags','pages','banners','breaking','featured','trending']);
+@endphp
+@section('title', $title)
+@section('content')
+<div class="page-heading"><div><span class="eyebrow">{{ in_array($module,['pages','categories','tags']) ? 'MANAJEMEN KONTEN' : 'OPERASIONAL REDAKSI' }}</span><h1>{{ $title }}</h1><p>{{ $description }}</p></div>@if(!in_array($module,['settings','audit']))<button type="button" class="primary-action" data-create-row>@include('admin.icon',['name'=>'plus']) {{ $createLabel }}</button>@endif</div>
+@if($module === 'settings')
+    @include('admin.management.settings')
+@else
+    @if($module==='users')<div class="role-guide"><div><strong>Penulis</strong><span>Membuat dan mengedit draft atau revisi miliknya, lalu mengajukan review.</span></div><div><strong>Editor / Admin</strong><span>Meninjau dan menerbitkan berita. Admin juga mengelola situs serta akun Penulis dan Editor.</span></div></div>@endif
+    <div class="module-summary"><span class="summary-icon">@include('admin.icon',['name'=>$icon])</span><div><strong>{{ number_format($total,0,',','.') }}</strong><span>{{ $title }}</span></div>@if($activeCount !== null)<div class="summary-divider"></div><span class="summary-count"><i class="status-dot dot-published"></i> {{ $activeCount }} aktif</span><span class="summary-count"><i class="status-dot"></i> {{ $total-$activeCount }} nonaktif</span>@else<span class="summary-description">{{ $module === 'audit' ? 'Riwayat tersimpan otomatis dari aktivitas redaksi' : 'Data terbaru dari ruang redaksi' }}</span>@endif</div>
+    <section class="workspace-card management-list">
+        <form class="list-toolbar" method="get"><div class="search-field"><label for="module-search" class="sr-only">Cari {{ $title }}</label><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="module-search" name="q" value="{{ request('q') }}" placeholder="Cari {{ mb_strtolower($title) }}..."></div>@if($activeCount !== null)<select name="state" aria-label="Filter status"><option value="">Semua status</option><option value="active" @selected(request('state')==='active')>Aktif</option><option value="inactive" @selected(request('state')==='inactive')>Nonaktif</option></select>@endif<button class="button-secondary" type="submit">Cari</button>@if(request()->filled('q')||request()->filled('state'))<a class="text-link" href="/admin/manage/{{ $module }}">Reset</a>@endif<span class="toolbar-result">{{ $rows->total() }} hasil</span></form>
+        @include('admin.management.rows')
+        <div class="pagination-container">{{ $rows->links('admin.pagination') }}</div>
+    </section>
+    @if($module !== 'audit')
+    <dialog class="management-dialog" id="management-dialog" aria-labelledby="management-title" data-open-on-error="{{ $errors->any() ? 'true' : 'false' }}">
+        <div class="dialog-heading"><div><span class="eyebrow">{{ $title }}</span><h2 id="management-title" data-create-title="{{ $createLabel }}">{{ old('id') ? 'Edit '.mb_strtolower($title) : $createLabel }}</h2></div><button type="button" class="icon-button" data-close-dialog aria-label="Tutup formulir">@include('admin.icon',['name'=>'close'])</button></div>
+        @if($errors->any())<div class="dialog-error" role="alert">{{ $errors->first() }}</div>@endif
+        <form id="management-form" method="post" enctype="multipart/form-data" action="/admin/manage/{{ $module }}" class="management-editor" data-module="{{ $module }}">@csrf<input type="hidden" name="id" value="{{ old('id') }}">
+            @include('admin.management.fields')
+            <div class="dialog-actions"><button type="button" class="button-secondary" data-close-dialog>Batal</button><button type="submit">Simpan {{ $module === 'pages' ? 'halaman' : 'perubahan' }} @include('admin.icon',['name'=>'check'])</button></div>
+        </form>
+    </dialog>
+    @endif
+@endif
+@endsection
 @push('scripts')@vite(['resources/js/manage.js'])@endpush

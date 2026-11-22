@@ -11,7 +11,7 @@ class EnsureEditorialSession
     public function handle(Request $request, Closure $next)
     {
         $user = $request->user()?->fresh();
-        if (! $user || ! $user->active || ! in_array($user->role, ['admin', 'editor', 'penulis'], true)
+        if (! $user || ! $user->active || ! in_array($user->role, ['developer', 'admin', 'editor', 'penulis'], true)
             || $request->session()->get('session_version') !== $user->session_version) {
             Auth::logout();
             $request->session()->invalidate();
@@ -22,6 +22,9 @@ class EnsureEditorialSession
 
         Auth::setUser($user);
 
-        return $next($request)->header('Cache-Control', 'private, no-store')->header('X-Robots-Tag', 'noindex');
+        $response = $next($request);
+        $response->headers->set('Cache-Control', 'private, no-store');
+        $response->headers->set('X-Robots-Tag', 'noindex');
+        return $response;
     }
 }

@@ -20,7 +20,7 @@ class ImportKapuasRaya extends Command
             return self::FAILURE;
         }
         $user = User::findOrFail($this->option('user'));
-        if (! $user->active || ! in_array($user->role, ['admin', 'editor'])) {
+        if (! $user->active || ! in_array($user->role, ['developer', 'admin', 'editor'])) {
             $this->error('Pilih admin/editor aktif.');
 
             return self::FAILURE;

@@ -15,7 +15,7 @@ class ManagementTest extends TestCase
     {
         $admin = User::factory()->create(['role' => 'admin']);
         $this->actingAs($admin)->withSession(['session_version' => 1]);
-        $this->post('/admin/manage/users', ['id' => $admin->id, 'name' => $admin->name, 'email' => $admin->email, 'role' => 'penulis', 'active' => 1])->assertStatus(422);
+        $this->post('/admin/manage/users', ['id' => $admin->id, 'name' => $admin->name, 'email' => $admin->email, 'role' => 'penulis', 'active' => 1])->assertForbidden();
         $this->assertSame('admin', $admin->fresh()->role);
         foreach (['users', 'categories', 'tags', 'settings', 'banners', 'breaking', 'featured', 'pages', 'audit'] as $module) {
             $this->get('/admin/manage/'.$module)->assertOk();

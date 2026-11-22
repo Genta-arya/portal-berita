@@ -1,0 +1,1 @@
+<span class="schedule-date">{{ \Carbon\Carbon::parse($row->starts_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') }}</span><small class="cell-subtitle">s.d. {{ \Carbon\Carbon::parse($row->ends_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') }} WIB</small>

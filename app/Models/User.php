@@ -9,6 +9,21 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    public function isDeveloper(): bool
+    {
+        return $this->active && $this->role === 'developer';
+    }
+
+    public function isAdministrator(): bool
+    {
+        return $this->active && in_array($this->role, ['developer', 'admin'], true);
+    }
+
+    public function managesArticles(): bool
+    {
+        return $this->active && in_array($this->role, ['developer', 'admin', 'editor'], true);
+    }
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
@@ -31,6 +46,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'avatar_path',
     ];
 
     /**

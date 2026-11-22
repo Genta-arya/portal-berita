@@ -4,7 +4,7 @@
     <h1 class="sr-only">Beranda berita</h1>
     @include('public.banner', ['slot' => 'home_top'])
 
-    @if($channels->isNotEmpty())
+    @if($trendingTopics->isNotEmpty())
         <section class="topic-shelf" aria-label="Trending Topics" data-topic-shelf>
             <div class="topic-shelf-header">
                 <div class="topic-shelf-title">
@@ -28,12 +28,12 @@
             </div>
             <div class="topic-shelf-scroller">
                 <ul class="topic-list" data-topic-track tabindex="0">
-                    @foreach($channels->take(9) as $channel)
+                    @foreach($trendingTopics->take(9) as $channel)
                         @php
                             $image = $channel->articles->firstWhere('hero_media_id', '!=', null);
                         @endphp
                         <li>
-                            <a href="/kanal/{{ $channel->slug }}" class="topic-link">
+                            <a href="/kanal/{{ $channel->slug }}" class="topic-link" data-story-topic="{{ $channel->id }}" aria-haspopup="dialog">
                                 <span class="topic-image-wrap">
                                     <span class="topic-image" aria-hidden="true">
                                         @if($image)
@@ -52,6 +52,7 @@
                 </ul>
             </div>
         </section>
+        @include('public.topic-stories')
     @endif
 
     <div class="frontpage-grid">
@@ -113,7 +114,7 @@
             $firstChannel = $channels->first();
             $otherChannels = $channels->skip(1);
         @endphp
-        <section class="channel-section" aria-label="Kanal Berita">
+        <section class="channel-section" aria-label="Topik Berita">
             {{-- KATEGORI 1: FLEX SLIDE FULL-WIDTH --}}
             @if($firstChannel)
                 <section class="channel-block channel-block--flex-slide" data-flex-slider aria-label="Topik Utama: {{ $firstChannel->name }}">

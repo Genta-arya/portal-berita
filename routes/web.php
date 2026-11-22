@@ -10,22 +10,15 @@ use App\Models\Article;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/login', fn () => response()->view('auth.login')->header('Cache-Control', 'private, no-store')->header('X-Robots-Tag', 'noindex'))->name('login');
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 Route::get('/media/{media}/{variant}', [MediaController::class, 'show'])->whereNumber('media');
 Route::middleware(['auth', EnsureEditorialSession::class])->prefix('admin')->group(function () {
-    Route::get('/', function () {
-        $q = Article::query();
-        if (auth()->user()->role === 'penulis') {
-            $q->where('author_id', auth()->id());
-        }
-        $counts = (clone $q)->selectRaw('status,count(*) as total')->groupBy('status')->pluck('total', 'status');
-        $recent = $q->latest('id')->limit(8)->get();
-        $views = DB::table('article_view_daily')->whereIn('article_id', Article::when(auth()->user()->role === 'penulis', fn ($q) => $q->where('author_id', auth()->id()))->select('id'))->sum('views');
-
-        return view('admin.dashboard', compact('counts', 'recent', 'views'));
-    })->name('admin');
+    Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('admin');
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class,'edit']);
+    Route::post('/profile', [\App\Http\Controllers\ProfileController::class,'update']);
+    Route::get('/users/{user}/avatar', [\App\Http\Controllers\ProfileController::class,'avatar'])->whereNumber('user');
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::post('/articles', [ArticleController::class, 'store']);
     Route::get('/articles/{article}/edit', [ArticleController::class, 'edit']);

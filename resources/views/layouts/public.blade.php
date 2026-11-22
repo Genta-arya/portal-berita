@@ -170,8 +170,8 @@
     </div>
 </div>
 <div class="sticky-header-group">
-@if($tickerArticles->isNotEmpty())
-<aside class="latest-ticker" aria-label="10 berita terbaru" data-latest-ticker><div class="wrap ticker-inner"><strong class="ticker-label"><span class="fire-flame-wrap" aria-hidden="true"><i class="ember ember-1"></i><i class="ember ember-2"></i><i class="ember ember-3"></i></span>TERBARU</strong><div class="ticker-viewport"><div class="ticker-track"><ul class="ticker-items">@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}">{{ $tickerArticle->title }}</a></li>@endforeach</ul><ul class="ticker-items ticker-copy" aria-hidden="true" inert>@foreach($tickerArticles as $tickerArticle)<li><a href="{{ $tickerArticle->url }}" tabindex="-1">{{ $tickerArticle->title }}</a></li>@endforeach</ul></div></div></div></aside>
+@if($tickerItems->isNotEmpty())
+<aside class="latest-ticker" aria-label="{{ $tickerIsBreaking ? 'Breaking News' : '10 berita terbaru' }}" data-latest-ticker><div class="wrap ticker-inner"><strong class="ticker-label"><span class="fire-flame-wrap" aria-hidden="true"><i class="ember ember-1"></i><i class="ember ember-2"></i><i class="ember ember-3"></i></span>{{ $tickerIsBreaking ? 'BREAKING NEWS' : 'TERBARU' }}</strong><div class="ticker-viewport"><div class="ticker-track"><ul class="ticker-items">@foreach($tickerItems as $tickerArticle)<li>@if($tickerArticle->url)<a href="{{ $tickerArticle->url }}">{{ $tickerArticle->title }}</a>@else<span>{{ $tickerArticle->title }}</span>@endif</li>@endforeach</ul><ul class="ticker-items ticker-copy" aria-hidden="true" inert>@foreach($tickerItems as $tickerArticle)<li>@if($tickerArticle->url)<a href="{{ $tickerArticle->url }}" tabindex="-1">{{ $tickerArticle->title }}</a>@else<span>{{ $tickerArticle->title }}</span>@endif</li>@endforeach</ul></div></div></div></aside>
 @endif
 <header class="reader-header">
     <div class="wrap reader-masthead">
@@ -212,9 +212,7 @@
     </div>
 </div></div>
 </div>
-@if($breaking)
-<div class="reader-breaking"><div class="wrap"><strong><span aria-hidden="true"></span> BREAKING NEWS</strong>@if($breaking->url)<a href="{{ $breaking->url }}">{{ $breaking->text }}</a>@else<span>{{ $breaking->text }}</span>@endif</div></div>
-@endif
+
 <main id="content" class="wrap reader-main">@yield('content')</main>
 @include('public.index-section')
 <footer class="reader-footer footer-compact">

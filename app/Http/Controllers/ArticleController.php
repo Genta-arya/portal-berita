@@ -20,6 +20,7 @@ class ArticleController extends Controller
         if ($r->user()->role === 'penulis') {
             $q->where('author_id', $r->user()->id);
         }
+        $statusCounts = (clone $q)->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
         foreach (['status', 'category_id', 'author_id'] as $field) {
             if ($r->filled($field)) {
                 $q->where($field, $r->input($field));
@@ -33,7 +34,7 @@ class ArticleController extends Controller
             $q->whereDate('created_at', $r->date);
         }
 
-        return view('admin.articles', ['articles' => $q->latest('id')->paginate(20)->withQueryString(), 'categories' => Category::orderBy('position')->get()]);
+        return view('admin.articles', ['statusCounts' => $statusCounts, 'articles' => $q->latest('id')->paginate(20)->withQueryString(), 'categories' => Category::orderBy('position')->get()]);
     }
 
     public function store(Request $r, EditorialService $service)
@@ -98,7 +99,7 @@ class ArticleController extends Controller
 
     public function assign(Request $r, Article $article, EditorialService $service)
     {
-        abort_unless($r->user()->role === 'admin', 403);
+        abort_unless($r->user()->isAdministrator(), 403);
         $r->validate(['author_id' => 'required|exists:users,id', 'version' => 'required|integer']);
         DB::transaction(function () use ($r, $article, $service) {
             $a = Article::lockForUpdate()->findOrFail($article->id);

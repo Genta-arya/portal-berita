@@ -23,6 +23,6 @@ class MediaService
     {
         $media = DB::table('media')->find($id);
 
-        return $media && $user->active && ($media->user_id === $user->id || in_array($user->role, ['admin', 'editor']) || $this->public($id));
+        return $media && $user->active && ($media->user_id === $user->id || in_array($user->role, ['developer', 'admin', 'editor']) || $this->public($id));
     }
 }

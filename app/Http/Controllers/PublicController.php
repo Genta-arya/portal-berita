@@ -14,13 +14,17 @@ class PublicController extends Controller
 {
     public function home()
     {
-        $picks = Article::published()->with('category')->whereIn('id', DB::table('featured_placements')->where('location', 'pick')->select('article_id'))->limit(6)->get();
-        $popular = Article::published()->with('category')->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(6)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')->limit(5)->get(['articles.*', 'v.total']);
+        $placementQuery = fn ($location) => Article::published()->with('category')
+            ->join('featured_placements as placement', 'articles.id', '=', 'placement.article_id')
+            ->where('placement.location', $location)->orderBy('placement.position')->orderBy('placement.id')->select('articles.*');
+        $picks = $placementQuery('pick')->limit(6)->get();
+        $popular = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
         $popularTitle = $popular->isEmpty() ? 'Terbaru' : 'Terpopuler';
         if ($popular->isEmpty()) {
             $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
         }
-        $featured = $popular->take(5);
+        $featured = $placementQuery('headline')->limit(5)->get();
+        if ($featured->isEmpty() && ! DB::table('site_settings')->where('key','home_headlines_managed')->where('value','1')->exists()) $featured = $popular->take(5);
         $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
         $channels = Category::where('active', true)
             ->whereHas('articles', fn ($query) => $query->published())
@@ -28,7 +32,13 @@ class PublicController extends Controller
             ->with(['articles' => fn ($query) => $query->published()->latest('published_at')->latest('id')->limit(8)])
             ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(9)->get();
 
-        return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels'));
+        $trendingTopics = Category::where('categories.active', true)
+            ->join('trending_topics as trending', 'categories.id', '=', 'trending.category_id')
+            ->where('trending.active', true)->whereHas('articles', fn ($q) => $q->published())
+            ->with(['articles' => fn ($q) => $q->published()->latest('published_at')->latest('id')->limit(8)])
+            ->orderBy('trending.position')->orderBy('trending.id')->limit(9)->get(['categories.*']);
+
+        return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels', 'trendingTopics'));
     }
 
     public function listing(Request $r, ?string $kind = null, ?string $slug = null)
@@ -118,18 +128,7 @@ class PublicController extends Controller
         }
 
         // Ambil berita trending (berdasarkan view harian 7 hari terakhir atau fallback terpopuler/terbaru)
-        $trendingArticles = Cache::remember('site:listing_trending', 300, function () {
-            $popular = Article::published()->with('category')
-                ->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(7)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')
-                ->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')
-                ->limit(5)->get(['articles.*', 'v.total']);
-
-            if ($popular->isEmpty()) {
-                $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
-            }
-
-            return $popular;
-        });
+        $trendingArticles = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
 
         // Ambil berita pilihan/lainnya untuk sidebar widget
         $otherArticles = Cache::remember('site:listing_others', 300, function () use ($trendingArticles) {
@@ -155,18 +154,7 @@ class PublicController extends Controller
         $related = Article::published()->where('id', '!=', $id)->where(fn ($q) => $q->where('category_id', $article->category_id)->orWhereHas('tags', fn ($q) => $q->whereIn('tags.id', $article->tags->pluck('id'))))->latest('published_at')->limit(6)->get();
 
         // Ambil berita trending untuk sidebar detail artikel
-        $trendingArticles = Cache::remember('site:listing_trending', 300, function () {
-            $popular = Article::published()->with('category')
-                ->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(7)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')
-                ->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')
-                ->limit(5)->get(['articles.*', 'v.total']);
-
-            if ($popular->isEmpty()) {
-                $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
-            }
-
-            return $popular;
-        });
+        $trendingArticles = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
 
         // Ambil berita pilihan/lainnya untuk sidebar detail artikel
         $otherArticles = Cache::remember('site:listing_others', 300, function () use ($trendingArticles) {
@@ -187,8 +175,8 @@ class PublicController extends Controller
             try {
                 $key = 'view:'.hash('sha256', $r->session()->getId().':'.$a->id);
                 if (Cache::add($key, true, 1800)) {
-                    DB::table('article_view_daily')->insertOrIgnore(['article_id' => $id, 'date' => now()->toDateString(), 'views' => 0]);
-                    DB::table('article_view_daily')->where('article_id', $id)->where('date', now()->toDateString())->increment('views');
+                    DB::table('article_view_daily')->insertOrIgnore(['article_id' => $id, 'date' => now()->timezone('Asia/Jakarta')->toDateString(), 'views' => 0]);
+                    DB::table('article_view_daily')->where('article_id', $id)->where('date', now()->timezone('Asia/Jakarta')->toDateString())->increment('views');
                 }
             } catch (\Throwable $e) {
                 report($e);

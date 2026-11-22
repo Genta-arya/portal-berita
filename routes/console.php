@@ -36,7 +36,7 @@ Artisan::command('editorial:restore {path}', function () {
 Artisan::command('editorial:reset-password {email}', function () {
     $user = User::where('email', $this->argument('email'))->firstOrFail();
     $password = $this->secret('Password baru (minimal 12 karakter)');
-    if (! is_string($password) || strlen($password) < 12) {
+    if (! is_string($password) || strlen($password) < 8) {
         $this->error('Password terlalu pendek.');
 
         return 1;
@@ -78,16 +78,21 @@ Artisan::command('editorial:prune', function () {
 });
 Schedule::command('editorial:prune')->daily();
 
-Artisan::command('editorial:create-admin {email} {name}', function () {
+Artisan::command('editorial:create-admin {email} {name} {--developer= : ID developer aktif yang membuat akun}', function () {
+    $developer = User::find($this->option('developer'));
+    if (!$developer || !$developer->isDeveloper()) {
+        $this->error('Pembuatan admin memerlukan --developer=ID developer aktif.');
+        return 1;
+    }
     $email = $this->argument('email');
     if (! filter_var($email, FILTER_VALIDATE_EMAIL) || User::where('email', $email)->exists()) {
         $this->error('Email tidak valid atau sudah digunakan.');
 
         return 1;
     }
-    $password = $this->secret('Password admin (minimal 12 karakter)');
-    if (! is_string($password) || strlen($password) < 12) {
-        $this->error('Password minimal 12 karakter.');
+    $password = $this->secret('Password admin (minimal 8 karakter)');
+    if (! is_string($password) || strlen($password) < 8) {
+        $this->error('Password minimal 8 karakter.');
 
         return 1;
     }
@@ -99,7 +104,7 @@ Artisan::command('editorial:create-admin {email} {name}', function () {
     $user->active = true;
     $user->slug = Str::slug($user->name).'-'.Str::lower(Str::random(8));
     $user->save();
-    app(EditorialService::class)->audit(null, 'cli_admin_created', 'user', $user->id);
+    app(EditorialService::class)->audit($developer, 'cli_admin_created', 'user', $user->id);
     $this->info('Akun admin dibuat.');
 
     return 0;

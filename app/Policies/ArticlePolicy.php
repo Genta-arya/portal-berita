@@ -18,11 +18,11 @@ class ArticlePolicy
 
     public function manage(User $user): bool
     {
-        return $user->active && in_array($user->role, ['admin', 'editor'], true);
+        return $user->managesArticles();
     }
 
     public function delete(User $user, Article $article): bool
     {
-        return $article->published_at === null && $this->update($user, $article);
+        return $article->published_at === null && $this->manage($user);
     }
 }

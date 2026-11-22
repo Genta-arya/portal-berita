@@ -46,7 +46,7 @@
                     </div>
                     <div class="kr-tts-meta">
                         <span class="kr-tts-label">Dengarkan Berita Ini</span>
-                        <span class="kr-tts-status" id="krTtsStatus">Siap dibacakan</span>
+                        <span class="kr-tts-status" id="krTtsStatus"></span>
                     </div>
                 </div>
 
@@ -626,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
             highlightSentence(-1);
 
             ttsPlayer.classList.remove('is-active');
-            if (ttsStatus) ttsStatus.textContent = 'Siap dibacakan';
+            if (ttsStatus) ttsStatus.textContent = '';
             if (ttsPlayBtn) {
                 ttsPlayBtn.style.display = 'inline-flex';
                 if (ttsPlayText) ttsPlayText.textContent = 'Putar';

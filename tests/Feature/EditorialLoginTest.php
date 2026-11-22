@@ -34,4 +34,31 @@ class EditorialLoginTest extends TestCase
         $this->get('/admin')->assertRedirect('/login');
         $this->assertGuest();
     }
+
+    public function test_valid_session_skips_login_form_for_every_editorial_role(): void
+    {
+        foreach (['developer','admin','editor','penulis'] as $role) {
+            $user = User::factory()->create(['role'=>$role]);
+            $this->actingAs($user)->withSession(['session_version'=>$user->session_version])
+                ->get('/login')->assertRedirect('/admin')->assertHeader('Cache-Control','no-store, private');
+        }
+    }
+
+    public function test_stale_or_inactive_session_returns_login_form_without_redirect_loop(): void
+    {
+        foreach (['inactive','revoked','invalid_role'] as $case) {
+            $user = User::factory()->create();
+            $this->actingAs($user)->withSession(['session_version'=>$user->session_version]);
+            if ($case === 'inactive') { $user->active=false; $user->save(); }
+            elseif ($case === 'revoked') $user->increment('session_version');
+            else { $user->role = 'invalid'; $user->save(); }
+            $this->get('/login')->assertOk()->assertSee('Masuk ke redaksi');
+            $this->assertGuest();
+        }
+    }
+
+    public function test_guest_still_sees_login_form(): void
+    {
+        $this->get('/login')->assertOk()->assertSee('Masuk ke redaksi');
+    }
 }

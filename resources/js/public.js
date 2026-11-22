@@ -107,7 +107,7 @@ if(latestTicker){
             event.currentTarget.setAttribute('aria-pressed',String(paused));
             event.currentTarget.setAttribute('aria-label',paused?'Putar berita berjalan':'Jeda berita berjalan');
             const iconSpan = event.currentTarget.querySelector('span');
-            if(iconSpan) iconSpan.textContent=paused?'▷':'Ⅱ';
+            if(iconSpan) iconSpan.textContent=paused?'\u25b7':'\u2161';
         });
     }
 }
@@ -216,3 +216,137 @@ document.querySelectorAll('[data-flex-slider]').forEach(slider => {
         });
     }
 });
+
+// Trending topics open a keyboard-accessible, timed story viewer.
+const storyDialog = document.querySelector('[data-story-dialog]');
+if (storyDialog) {
+    const topics = JSON.parse(document.getElementById('topic-story-data').textContent);
+    const get = selector => storyDialog.querySelector(selector);
+    const progress = get('.topic-stories-progress');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let topicIndex = 0, storyIndex = 0, elapsed = 0, last = 0, frame = 0;
+    let opener, previousOverflow;
+    const duration = 8000;
+    const storyImages = new Map();
+    let renderVersion = 0, imageLoading = false;
+    function loadStoryImage(url) {
+        if (!storyImages.has(url)) {
+            const image = new Image();
+            const ready = new Promise(resolve => {
+                image.onload = async () => {
+                    try { await image.decode(); } catch {}
+                    resolve(image);
+                };
+                image.onerror = () => resolve(null);
+            });
+            image.src = url;
+            storyImages.set(url, ready);
+        }
+        return storyImages.get(url);
+    }
+    const storySequence = topics.flatMap(topic => topic.articles);
+    function preloadNeighbors(item) {
+        const index = storySequence.indexOf(item);
+        [storySequence[index - 1], storySequence[index + 1], storySequence[index + 2]]
+            .forEach(neighbor => { if (neighbor?.image) loadStoryImage(neighbor.image); });
+    }
+    function render() {
+        const topic = topics[topicIndex], item = topic.articles[storyIndex];
+        get('[data-story-prev]').disabled = storyIndex === 0;
+        get('[data-story-next]').disabled = storyIndex === topic.articles.length - 1;
+        elapsed = 0; last = 0;
+        get('#story-topic-title').textContent = topic.name;
+        get('[data-story-time]').textContent = item.time || '';
+        get('[data-story-title]').textContent = item.title;
+        get('[data-story-summary]').textContent = item.summary;
+        get('[data-story-summary]').hidden = !item.summary;
+        get('[data-story-link]').href = item.url;
+        get('[data-story-image-link]').href = item.url;
+        get('[data-story-image-link]').setAttribute('aria-label', `Baca berita: ${item.title}`);
+        const version = ++renderVersion;
+        const avatar = get('[data-story-avatar]');
+        const image = get('[data-story-image]');
+        const backdrop = get('.topic-stories-backdrop');
+        // Clear every old image immediately, including the blurred background.
+        image.hidden = true;
+        image.removeAttribute('src');
+        avatar.hidden = true;
+        avatar.removeAttribute('src');
+        get('[data-story-initials]').hidden = false;
+        backdrop.style.backgroundImage = 'none';
+        imageLoading = !!item.image;
+        get('.topic-stories-visual').setAttribute('aria-busy', String(imageLoading));
+        if (item.image) {
+            loadStoryImage(item.image).then(loaded => {
+                if (version !== renderVersion) return;
+                imageLoading = false;
+                last = 0;
+                get('.topic-stories-visual').setAttribute('aria-busy', 'false');
+                if (!loaded) return;
+                image.src = loaded.src;
+                image.alt = item.alt;
+                image.hidden = false;
+                avatar.src = loaded.src;
+                avatar.hidden = false;
+                get('[data-story-initials]').hidden = true;
+                backdrop.style.backgroundImage = `url(${JSON.stringify(loaded.src)})`;
+            });
+        }
+        preloadNeighbors(item);
+        progress.replaceChildren(...topic.articles.map((_, index) => {
+            const segment = document.createElement('span'), fill = document.createElement('i');
+            fill.style.transform = `scaleX(${index < storyIndex ? 1 : 0})`;
+            segment.append(fill); return segment;
+        }));
+    }
+    function move(direction) {
+        const nextIndex = storyIndex + direction;
+        if (nextIndex < 0 || nextIndex >= topics[topicIndex].articles.length) return;
+        storyIndex = nextIndex;
+        render();
+    }
+    function tick(now) {
+        if (!storyDialog.open) return;
+        if (last && !reducedMotion.matches && !document.hidden && !imageLoading) elapsed += Math.min(now - last, 250);
+        last = now;
+        const fill = progress.children[storyIndex]?.firstChild;
+        if (fill) fill.style.transform = `scaleX(${Math.min(elapsed / duration, 1)})`;
+        if (elapsed >= duration) {
+            if (storyIndex < topics[topicIndex].articles.length - 1) move(1);
+            else storyDialog.close();
+        }
+        if (storyDialog.open) frame = requestAnimationFrame(tick);
+    }
+    document.querySelectorAll('[data-story-topic]').forEach(link => {
+        link.addEventListener('click', event => {
+            if (event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+            const index = topics.findIndex(topic => String(topic.id) === link.dataset.storyTopic);
+            if (index < 0 || !topics[index].articles.length) return;
+            event.preventDefault(); opener = link; topicIndex = index; storyIndex = 0;
+            previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            render(); storyDialog.showModal(); get('[data-story-close]').focus();
+            frame = requestAnimationFrame(tick);
+        });
+    });
+    get('[data-story-close]').addEventListener('click', () => storyDialog.close());
+    get('[data-story-prev]').addEventListener('click', () => move(-1));
+    get('[data-story-next]').addEventListener('click', () => move(1));
+    storyDialog.addEventListener('click', event => { if (event.target === storyDialog) storyDialog.close(); });
+    storyDialog.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); move(event.key === 'ArrowRight' ? 1 : -1); }
+    });
+    let touchStart;
+    get('.topic-stories-body').addEventListener('touchstart', event => { touchStart = event.touches[0].clientX; }, { passive: true });
+    get('.topic-stories-body').addEventListener('touchend', event => {
+        if (touchStart == null) return;
+        const distance = event.changedTouches[0].clientX - touchStart;
+        if (Math.abs(distance) > 55) move(distance < 0 ? 1 : -1);
+        touchStart = null;
+    }, { passive: true });
+    storyDialog.addEventListener('close', () => {
+        ++renderVersion;
+        cancelAnimationFrame(frame); document.body.style.overflow = previousOverflow;
+        opener?.focus();
+    });
+}
