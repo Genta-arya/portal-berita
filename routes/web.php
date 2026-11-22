@@ -14,6 +14,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 Route::get('/media/{media}/{variant}', [MediaController::class, 'show'])->whereNumber('media');
+Route::get('/author/{user}/avatar', [\App\Http\Controllers\ProfileController::class, 'publicAvatar'])->whereNumber('user');
 Route::middleware(['auth', EnsureEditorialSession::class])->prefix('admin')->group(function () {
     Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('admin');
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class,'edit']);

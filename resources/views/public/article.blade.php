@@ -40,11 +40,39 @@
                 @endif
             </div>
             <h1>{{ $article->title }}</h1>
-            <div class="byline">
-                <a href="/penulis/{{ $article->author->slug }}">{{ $article->guest_author ?: $article->author->name }}</a>
-                @if($article->editor_id) · Editor: {{ \App\Models\User::find($article->editor_id)?->name }}@endif
-                <br>{{ $article->published_at?->timezone('Asia/Jakarta')->format('d F Y, H:i') }} WIB
-                <br>Diperbarui {{ $article->updated_at->timezone('Asia/Jakarta')->format('d F Y, H:i') }} WIB
+            {{-- Redesigned Author Byline Card --}}
+            <div class="kr-article-byline" aria-label="Informasi Penulis dan Waktu Terbit">
+                <div class="kr-byline-avatar">
+                    @if($article->author?->avatar_path)
+                        <img src="/author/{{ $article->author_id }}/avatar" alt="{{ $article->author->name }}" width="44" height="44" loading="lazy">
+                    @else
+                        <span class="kr-avatar-fallback" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                    @endif
+                </div>
+                <div class="kr-byline-meta">
+                    <div class="kr-byline-author-row">
+                        <span class="kr-byline-prefix">Post oleh:</span>
+                        <a href="/penulis/{{ $article->author->slug }}" class="kr-byline-name">{{ $article->guest_author ?: $article->author->name }}</a>
+                        @if($article->editor_id)
+                            <span class="kr-byline-editor">· Editor: {{ \App\Models\User::find($article->editor_id)?->name }}</span>
+                        @endif
+                    </div>
+                    <div class="kr-byline-date-row">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <time datetime="{{ $article->published_at?->toIso8601String() }}">
+                            {{ $article->published_at?->timezone('Asia/Jakarta')->translatedFormat('l, d F Y · H:i') }} WIB
+                        </time>
+                    </div>
+                </div>
+            </div>
             {{-- Text-To-Speech (Bacakan Berita) Player Bar --}}
             <div class="kr-tts-player" id="krTtsPlayer">
                 <div class="kr-tts-info">

@@ -22,4 +22,13 @@ class ProfileController extends Controller
         abort_unless($user->avatar_path && Storage::disk('local')->exists($user->avatar_path),404);
         return response()->file(Storage::disk('local')->path($user->avatar_path),['Content-Type'=>'image/jpeg','Cache-Control'=>'private, no-store','X-Content-Type-Options'=>'nosniff']);
     }
+    public function publicAvatar(User $user)
+    {
+        abort_unless($user->avatar_path && Storage::disk('local')->exists($user->avatar_path), 404);
+        return response()->file(Storage::disk('local')->path($user->avatar_path), [
+            'Content-Type' => 'image/jpeg',
+            'Cache-Control' => 'public, max-age=86400',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
 }
