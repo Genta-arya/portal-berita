@@ -41,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
                             // Strip any localhost or domain so it's safely relative or domain-aware
                             $url = preg_replace('#^https?://[^/]+#', '', $url);
                             if (preg_match('#^/berita/(\d+)(/.*)?$#', $url, $m)) {
-                                $hashId = \App\Services\HashIdService::encode((int)$m[1]);
+                                $hashId = \App\Models\Article::hashId((int)$m[1]);
                                 $url = '/berita/' . $hashId . ($m[2] ?? '');
                             }
                         }
