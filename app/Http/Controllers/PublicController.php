@@ -14,31 +14,37 @@ class PublicController extends Controller
 {
     public function home()
     {
-        $placementQuery = fn ($location) => Article::published()->with('category')
-            ->join('featured_placements as placement', 'articles.id', '=', 'placement.article_id')
-            ->where('placement.location', $location)->orderBy('placement.position')->orderBy('placement.id')->select('articles.*');
-        $picks = $placementQuery('pick')->limit(6)->get();
-        $popular = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
-        $popularTitle = $popular->isEmpty() ? 'Terbaru' : 'Terpopuler';
-        if ($popular->isEmpty()) {
-            $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
-        }
-        $featured = $placementQuery('headline')->limit(5)->get();
-        if ($featured->isEmpty() && ! DB::table('site_settings')->where('key','home_headlines_managed')->where('value','1')->exists()) $featured = $popular->take(5);
-        $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
-        $channels = Category::where('active', true)
-            ->whereHas('articles', fn ($query) => $query->published())
-            ->withCount(['articles' => fn ($query) => $query->published()])
-            ->with(['articles' => fn ($query) => $query->published()->latest('published_at')->latest('id')->limit(8)])
-            ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(9)->get();
+        $data = Cache::remember('site:home_curation', 120, function () {
+            $placementQuery = fn ($location) => Article::published()->with('category')
+                ->join('featured_placements as placement', 'articles.id', '=', 'placement.article_id')
+                ->where('placement.location', $location)->orderBy('placement.position')->orderBy('placement.id')->select('articles.*');
+            $picks = $placementQuery('pick')->limit(6)->get();
+            $popular = app(\App\Services\PopularArticles::class)->query()->limit(5)->get();
+            $popularTitle = $popular->isEmpty() ? 'Terbaru' : 'Terpopuler';
+            if ($popular->isEmpty()) {
+                $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
+            }
+            $featured = $placementQuery('headline')->limit(5)->get();
+            if ($featured->isEmpty() && ! DB::table('site_settings')->where('key', 'home_headlines_managed')->where('value', '1')->exists()) {
+                $featured = $popular->take(5);
+            }
+            $latest = Article::published()->with('category')->whereNotIn('id', $featured->pluck('id'))->latest('published_at')->latest('id')->limit(12)->get();
+            $channels = Category::where('active', true)
+                ->whereHas('articles', fn ($query) => $query->published())
+                ->withCount(['articles' => fn ($query) => $query->published()])
+                ->with(['articles' => fn ($query) => $query->published()->with('category')->latest('published_at')->latest('id')->limit(8)])
+                ->orderByDesc('articles_count')->orderBy('position')->orderBy('id')->limit(9)->get();
 
-        $trendingTopics = Category::where('categories.active', true)
-            ->join('trending_topics as trending', 'categories.id', '=', 'trending.category_id')
-            ->where('trending.active', true)->whereHas('articles', fn ($q) => $q->published())
-            ->with(['articles' => fn ($q) => $q->published()->latest('published_at')->latest('id')->limit(8)])
-            ->orderBy('trending.position')->orderBy('trending.id')->limit(9)->get(['categories.*']);
+            $trendingTopics = Category::where('categories.active', true)
+                ->join('trending_topics as trending', 'categories.id', '=', 'trending.category_id')
+                ->where('trending.active', true)->whereHas('articles', fn ($q) => $q->published())
+                ->with(['articles' => fn ($q) => $q->published()->with('category')->latest('published_at')->latest('id')->limit(8)])
+                ->orderBy('trending.position')->orderBy('trending.id')->limit(9)->get(['categories.*']);
 
-        return view('public.home', compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels', 'trendingTopics'));
+            return compact('featured', 'latest', 'picks', 'popular', 'popularTitle', 'channels', 'trendingTopics');
+        });
+
+        return view('public.home', $data);
     }
 
     public function listing(Request $r, ?string $kind = null, ?string $slug = null)
