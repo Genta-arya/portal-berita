@@ -25,10 +25,24 @@
             @isset($preview)
                 <p class="notice">Preview privat · {{ $article->status }}</p>
             @endisset
-            <a class="eyebrow" href="/kanal/{{ $article->category?->slug }}">{{ $article->category?->name }}</a>
-            @if($article->sponsored)
-                <p class="badge">Konten sponsor</p>
-            @endif
+            <div class="reading-badge-wrap">
+                <a class="eyebrow kr-category-pill" href="/kanal/{{ $article->category?->slug }}">
+                    <span class="kr-pill-flame" aria-hidden="true">
+                        <i class="ember ember-1"></i>
+                        <i class="ember ember-2"></i>
+                        <i class="ember ember-3"></i>
+                    </span>
+                    <span class="kr-pill-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12c0 2.85 1.2 5.41 3.12 7.24.47.45 1.2.33 1.5-.24.33-.64.88-1.55 1.57-2.33 1.09-1.24 2.21-1.74 3.01-1.92.51-.12.8-.62.8-1.14 0-.82-.6-1.53-1.42-1.61-1.43-.14-2.58-1.33-2.58-2.77 0-1.26.85-2.34 2.05-2.67.62-.17 1.05-.72 1.05-1.36 0-1.12.98-2.02 2.13-1.91 1.05.1 1.87.97 1.87 2.02 0 .58.47 1.05 1.05 1.05s1.05-.47 1.05-1.05c0-2.21-1.79-4-4-4-.48 0-.94.09-1.36.25C11.64 2.19 11.82 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9.4-.51.35-1.25-.12-1.7-.51-.48-1.32-.44-1.78.1C2.39 7.23 1.5 9.51 1.5 12c0 5.8 4.7 10.5 10.5 10.5 3.07 0 5.83-1.32 7.76-3.43.43-.47.38-1.21-.1-1.65-.46-.43-1.19-.4-1.62.08C16.51 19.14 14.38 20 12 20z"/>
+                        </svg>
+                    </span>
+                    <span>{{ $article->category?->name }}</span>
+                </a>
+                @if($article->sponsored)
+                    <p class="badge">Konten sponsor</p>
+                @endif
+            </div>
             <h1>{{ $article->title }}</h1>
             <div class="byline">
                 <a href="/penulis/{{ $article->author->slug }}">{{ $article->guest_author ?: $article->author->name }}</a>
@@ -158,9 +172,16 @@
 
             <div class="prose" id="krArticleProse">{!! $renderedBody !!}</div>
 
-            <div class="tags">
+            <div class="tags kr-article-tags">
+                <span class="kr-tags-heading">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                        <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    Topik Terkait:
+                </span>
                 @foreach($article->tags as $tag)
-                    <a href="/tag/{{ $tag->slug }}">#{{ $tag->name }}</a>
+                    <a href="/tag/{{ $tag->slug }}" class="kr-tag-pill">#{{ $tag->name }}</a>
                 @endforeach
             </div>
 
