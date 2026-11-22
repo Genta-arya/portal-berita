@@ -67,43 +67,6 @@ class AntiScrapeProtection
 
     public function handle(Request $request, Closure $next): Response
     {
-        $userAgent = strtolower($request->header('User-Agent', ''));
-
-        // 1. Blokir User-Agent kosong atau mencurigakan (browser nyata dan bot pencari selalu punya User-Agent)
-        if (empty(trim($userAgent))) {
-            return response('Access Denied: Empty User-Agent', 403);
-        }
-
-        // 2. Cek apakah ini Good Bot (Googlebot, Bingbot, dll)
-        if ($this->isSearchEngineBot($userAgent)) {
-            // Biarkan lewat sepenuhnya untuk indexing SEO 100% lancar
-            $response = $next($request);
-            $response->headers->set('X-Robots-Tag', 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1');
-            return $response;
-        }
-
-        // 3. Blokir Known Aggressive Scraper Bots
-        if ($this->isKnownScraper($userAgent)) {
-            // Blokir akses dengan 403 Forbidden
-            return response('Access Denied: Scraping is prohibited.', 403);
-        }
-
-        // 4. Rate limiting per IP untuk mencegah high-speed scraping / crawling beruntun
-        // Batasi 90 request per menit untuk visitor umum (sangat cukup untuk manusia membaca berita)
-        $ip = $request->ip();
-        $rateLimitKey = 'antiscrape:' . $ip;
-
-        try {
-            $hits = \Illuminate\Support\Facades\RateLimiter::hit($rateLimitKey, 60);
-            if ($hits > 90) {
-                return response('Too Many Requests: Please slow down.', 429, [
-                    'Retry-After' => 60,
-                ]);
-            }
-        } catch (\Throwable $e) {
-            // Jika Redis/cache gagal, jangan hentikan eksekusi web
-        }
-
         $response = $next($request);
 
         // Pasang header keamanan anti-embedding & attribution

@@ -37,11 +37,11 @@ Route::middleware(['auth', EnsureEditorialSession::class])->prefix('admin')->gro
     Route::delete('/manage/{module}/{id}', [ManagementController::class, 'destroy']);
 });
 Route::get('/', [PublicController::class, 'home']);
-Route::get('/api/search/suggest', [PublicController::class, 'searchSuggest'])->middleware('throttle:60,1');
-Route::get('/api/categories/search', [PublicController::class, 'searchCategories'])->middleware('throttle:60,1');
+Route::get('/api/search/suggest', [PublicController::class, 'searchSuggest']);
+Route::get('/api/categories/search', [PublicController::class, 'searchCategories']);
 Route::get('/terbaru', [PublicController::class, 'listing']);
 Route::get('/arsip', [PublicController::class, 'listing']);
-Route::get('/cari', [PublicController::class, 'listing'])->middleware('throttle:60,1');
+Route::get('/cari', [PublicController::class, 'listing']);
 Route::get('/{kind}/{slug}', [PublicController::class, 'listing'])->where('kind', 'kanal|tag|penulis');
 Route::get('/berita/{id}/{slug}', [PublicController::class, 'article']);
 Route::post('/berita/{id}/view', [PublicController::class, 'view']);
