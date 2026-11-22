@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ArticleReaction extends Model
+{
+    protected $fillable = [
+        'article_id',
+        'reaction',
+        'device_id',
+        'ip_address',
+        'user_agent',
+    ];
+
+    public function article()
+    {
+        return $this->belongsTo(Article::class);
+    }
+}

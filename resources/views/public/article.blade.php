@@ -132,6 +132,38 @@
                 </figure>
             @endif
 
+            {{-- Statistik Berita di Bawah Gambar (Views, Komentar, Suka) --}}
+            <div class="kr-article-stats-bar" aria-label="Statistik Artikel">
+                <div class="kr-stat-item" title="Jumlah Tayangan">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <span class="kr-stat-value" id="krStatViews">{{ number_format($totalViews ?? 0, 0, ',', '.') }}</span>
+                    <span class="kr-stat-label">kali dibaca</span>
+                </div>
+
+                <div class="kr-stat-divider" aria-hidden="true"></div>
+
+                <a href="#comments" class="kr-stat-item kr-stat-interactive" title="Lihat Komentar">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span class="kr-stat-value" id="krStatComments">0</span>
+                    <span class="kr-stat-label">komentar</span>
+                </a>
+
+                <div class="kr-stat-divider" aria-hidden="true"></div>
+
+                <button type="button" class="kr-stat-item kr-stat-interactive kr-stat-like-btn" id="krInlineLikeBtn" title="Sukai berita ini" data-reaction="like">
+                    <svg class="kr-icon-thumb" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                    </svg>
+                    <span class="kr-stat-value" id="krStatLikes">{{ number_format($likesCount ?? 0, 0, ',', '.') }}</span>
+                    <span class="kr-stat-label">suka</span>
+                </button>
+            </div>
+
             @php
                 $renderedBody = $article->body;
                 if ($related->isNotEmpty()) {
@@ -424,6 +456,59 @@
     <div class="kr-lightbox-stage" id="krLightboxStage">
         <div class="kr-lightbox-img-wrapper" id="krLightboxImgWrapper">
             <img src="" alt="" id="krLightboxImage" class="kr-lightbox-img" draggable="false">
+        </div>
+    </div>
+</div>
+
+{{-- Modal Popup Tanggapan Berita (Scroll Bawah / 30 Detik) --}}
+<div class="kr-reaction-modal" id="krReactionModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="krReactionTitle">
+    <div class="kr-reaction-backdrop" id="krReactionBackdrop"></div>
+    <div class="kr-reaction-dialog">
+        <button type="button" class="kr-reaction-close" id="krReactionCloseBtn" aria-label="Tutup popup tanggapan">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <div class="kr-reaction-content">
+            <div class="kr-reaction-badge">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Tanggapan Pembaca</span>
+            </div>
+            <h3 class="kr-reaction-title" id="krReactionTitle">Bagaimana tanggapan Anda tentang berita ini?</h3>
+            <p class="kr-reaction-article-title">"{{ Str::limit($article->title, 85) }}"</p>
+            
+            <div class="kr-reaction-actions" id="krReactionActions">
+                <button type="button" class="kr-reaction-btn kr-reaction-btn--like" data-reaction="like" id="krModalLikeBtn">
+                    <span class="kr-reaction-icon-box">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                        </svg>
+                    </span>
+                    <span class="kr-reaction-btn-text">Suka</span>
+                    <span class="kr-reaction-count" id="krModalLikeCount">({{ $likesCount ?? 0 }})</span>
+                </button>
+
+                <button type="button" class="kr-reaction-btn kr-reaction-btn--dislike" data-reaction="dislike" id="krModalDislikeBtn">
+                    <span class="kr-reaction-icon-box">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path>
+                        </svg>
+                    </span>
+                    <span class="kr-reaction-btn-text">Tidak Suka</span>
+                    <span class="kr-reaction-count" id="krModalDislikeCount">({{ $dislikesCount ?? 0 }})</span>
+                </button>
+            </div>
+
+            <div class="kr-reaction-toast" id="krReactionToast" style="display: none;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Terima kasih atas tanggapan Anda!</span>
+            </div>
         </div>
     </div>
 </div>
@@ -806,6 +891,168 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (ttsPlayer) {
         ttsPlayer.style.display = 'none';
     }
+
+    // =========================================================================
+    // POPUP TANGGAPAN BERITA (SCROLL BAWAH / 30 DETIK) & DEVICE-BASED REACTION
+    // =========================================================================
+    (function initReactionSystem() {
+        const articleId = '{{ \App\Models\Article::hashId($article->id) }}';
+        const reactionModal = document.getElementById('krReactionModal');
+        const reactionCloseBtn = document.getElementById('krReactionCloseBtn');
+        const reactionBackdrop = document.getElementById('krReactionBackdrop');
+        const modalLikeBtn = document.getElementById('krModalLikeBtn');
+        const modalDislikeBtn = document.getElementById('krModalDislikeBtn');
+        const modalLikeCount = document.getElementById('krModalLikeCount');
+        const modalDislikeCount = document.getElementById('krModalDislikeCount');
+        const reactionToast = document.getElementById('krReactionToast');
+        const inlineLikeBtn = document.getElementById('krInlineLikeBtn');
+        const statLikes = document.getElementById('krStatLikes');
+
+        if (!reactionModal) return;
+
+        // 1. Device ID Management (UUID / Persistent Fingerprint di LocalStorage)
+        function getOrCreateDeviceId() {
+            let id = localStorage.getItem('kr_device_id');
+            if (!id) {
+                if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+                    id = crypto.randomUUID().replace(/-/g, '');
+                } else {
+                    id = 'd_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+                }
+                localStorage.setItem('kr_device_id', id);
+            }
+            return id;
+        }
+
+        const deviceId = getOrCreateDeviceId();
+        const reactionKey = 'kr_reacted_' + articleId;
+        const dismissedKey = 'kr_reaction_dismissed_' + articleId;
+
+        // Update UI state jika sudah pernah like/dislike sebelumnya
+        const existingReaction = localStorage.getItem(reactionKey);
+        if (existingReaction) {
+            applyReactionUI(existingReaction);
+        }
+
+        function applyReactionUI(reaction) {
+            if (reaction === 'like') {
+                if (modalLikeBtn) modalLikeBtn.classList.add('is-active');
+                if (modalDislikeBtn) modalDislikeBtn.classList.remove('is-active');
+                if (inlineLikeBtn) inlineLikeBtn.classList.add('is-active');
+            } else if (reaction === 'dislike') {
+                if (modalDislikeBtn) modalDislikeBtn.classList.add('is-active');
+                if (modalLikeBtn) modalLikeBtn.classList.remove('is-active');
+                if (inlineLikeBtn) inlineLikeBtn.classList.remove('is-active');
+            }
+        }
+
+        let isModalShown = false;
+
+        function showReactionModal() {
+            if (isModalShown) return;
+            // Jika sudah bereaksi atau sudah ditutup pengguna sesi ini, jangan ganggu lagi
+            if (localStorage.getItem(reactionKey) || sessionStorage.getItem(dismissedKey)) {
+                return;
+            }
+            isModalShown = true;
+            reactionModal.classList.add('is-open');
+            reactionModal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeReactionModal() {
+            reactionModal.classList.remove('is-open');
+            reactionModal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            sessionStorage.setItem(dismissedKey, '1');
+        }
+
+        if (reactionCloseBtn) reactionCloseBtn.addEventListener('click', closeReactionModal);
+        if (reactionBackdrop) reactionBackdrop.addEventListener('click', closeReactionModal);
+
+        // A. Trigger 1: Berdiam di halaman selama 30 detik
+        const timerId = setTimeout(function() {
+            showReactionModal();
+        }, 30000);
+
+        // B. Trigger 2: User scroll sampai hampir ke bawah konten artikel (85% scroll)
+        let scrollTriggered = false;
+        function handleScroll() {
+            if (scrollTriggered || isModalShown) return;
+            const scrollY = window.scrollY || window.pageYOffset;
+            const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (totalHeight > 0 && (scrollY / totalHeight) >= 0.85) {
+                scrollTriggered = true;
+                window.removeEventListener('scroll', handleScroll);
+                showReactionModal();
+            }
+        }
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // C. Kirim tanggapan (Like / Dislike) ke backend dengan device info
+        function sendReaction(reaction) {
+            clearTimeout(timerId);
+            window.removeEventListener('scroll', handleScroll);
+
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            fetch('/berita/' + articleId + '/react', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': token || ''
+                },
+                body: JSON.stringify({
+                    reaction: reaction,
+                    device_id: deviceId
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem(reactionKey, reaction);
+                    applyReactionUI(reaction);
+
+                    if (modalLikeCount) modalLikeCount.textContent = '(' + data.likes_count + ')';
+                    if (modalDislikeCount) modalDislikeCount.textContent = '(' + data.dislikes_count + ')';
+                    if (statLikes) statLikes.textContent = data.likes_count.toLocaleString('id-ID');
+
+                    if (reactionToast) {
+                        reactionToast.style.display = 'flex';
+                    }
+
+                    setTimeout(function() {
+                        closeReactionModal();
+                    }, 1600);
+                }
+            })
+            .catch(err => {
+                console.warn('Reaction error:', err);
+                localStorage.setItem(reactionKey, reaction);
+                applyReactionUI(reaction);
+                setTimeout(closeReactionModal, 800);
+            });
+        }
+
+        if (modalLikeBtn) {
+            modalLikeBtn.addEventListener('click', function() {
+                sendReaction('like');
+            });
+        }
+
+        if (modalDislikeBtn) {
+            modalDislikeBtn.addEventListener('click', function() {
+                sendReaction('dislike');
+            });
+        }
+
+        if (inlineLikeBtn) {
+            inlineLikeBtn.addEventListener('click', function() {
+                sendReaction('like');
+            });
+        }
+    })();
 });
 </script>
 @endsection

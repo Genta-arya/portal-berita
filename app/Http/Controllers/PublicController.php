@@ -176,7 +176,12 @@ class PublicController extends Controller
                 ->get();
         });
 
-        return view('public.article', compact('article', 'related', 'trendingArticles', 'otherArticles'));
+        // Ambil statistik views dan likes
+        $totalViews = (int) DB::table('article_view_daily')->where('article_id', $article->id)->sum('views');
+        $likesCount = (int) DB::table('article_reactions')->where('article_id', $article->id)->where('reaction', 'like')->count();
+        $dislikesCount = (int) DB::table('article_reactions')->where('article_id', $article->id)->where('reaction', 'dislike')->count();
+
+        return view('public.article', compact('article', 'related', 'trendingArticles', 'otherArticles', 'totalViews', 'likesCount', 'dislikesCount'));
     }
 
     public function view(Request $r, string $id)
@@ -200,6 +205,49 @@ class PublicController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function react(Request $r, string $id)
+    {
+        $realId = Article::decodeHash($id);
+        if (! $realId) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
+
+        $article = Article::published()->findOrFail($realId);
+        $reaction = $r->input('reaction');
+        if (! in_array($reaction, ['like', 'dislike'])) {
+            return response()->json(['error' => 'Invalid reaction'], 422);
+        }
+
+        $deviceId = trim((string) $r->input('device_id', ''));
+        if (empty($deviceId) || strlen($deviceId) > 64) {
+            $deviceId = hash('sha256', $r->ip().'|'.($r->userAgent() ?? ''));
+        }
+
+        DB::table('article_reactions')->updateOrInsert(
+            [
+                'article_id' => $article->id,
+                'device_id' => $deviceId,
+            ],
+            [
+                'reaction' => $reaction,
+                'ip_address' => $r->ip(),
+                'user_agent' => substr((string) $r->userAgent(), 0, 500),
+                'updated_at' => now(),
+                'created_at' => now(),
+            ]
+        );
+
+        $likesCount = (int) DB::table('article_reactions')->where('article_id', $article->id)->where('reaction', 'like')->count();
+        $dislikesCount = (int) DB::table('article_reactions')->where('article_id', $article->id)->where('reaction', 'dislike')->count();
+
+        return response()->json([
+            'success' => true,
+            'user_reaction' => $reaction,
+            'likes_count' => $likesCount,
+            'dislikes_count' => $dislikesCount,
+        ]);
     }
 
     public function searchSuggest(Request $r)

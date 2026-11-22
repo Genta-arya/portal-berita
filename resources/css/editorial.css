@@ -2148,7 +2148,7 @@
 
 /* Inline Related News Card ("Baca Juga") inside Article Prose */
 .kr-inline-related {
-    margin: 22px 0;
+    margin: 14px 0;
     clear: both;
 }
 .kr-inline-related-card {
@@ -2226,21 +2226,24 @@
 
 /* Mobile-first adjustments */
 @media (max-width: 480px) {
+    .kr-inline-related {
+        margin: 10px 0;
+    }
     .kr-inline-related-card {
         gap: 10px;
-        padding: 8px 10px 8px 10px;
+        padding: 7px 10px;
     }
     .kr-inline-related-thumb {
-        flex: 0 0 84px;
-        width: 84px;
-        height: 58px;
+        flex: 0 0 76px;
+        width: 76px;
+        height: 52px;
     }
     .kr-inline-related-label {
         font-size: 10.5px;
     }
     .kr-inline-related-title {
-        font-size: 13.5px;
-        line-height: 1.35;
+        font-size: 13px;
+        line-height: 1.32;
     }
     .kr-inline-related-arrow {
         display: none;
@@ -5081,24 +5084,369 @@ html.dark .kr-google-login-btn:hover {
 /* Mobile Gap Adjustment for Related Stories below Share */
 @media (max-width: 760px) {
     .reader .reading {
-        padding: 16px 14px 20px 14px;
-        margin-bottom: 16px;
+        padding: 14px 12px 14px 12px;
+        margin-bottom: 12px;
+    }
+    .reader .share {
+        padding-top: 10px;
+        margin-bottom: 0;
     }
     .kr-comments-section {
-        margin-top: 18px;
-        padding-top: 16px;
+        margin-top: 14px;
+        padding-top: 12px;
     }
     .kr-comments-empty-card {
-        padding: 18px 14px;
-        gap: 10px;
+        padding: 14px 12px;
+        gap: 8px;
+    }
+    .kr-comments-empty-text {
+        font-size: 12.5px;
     }
     .reader .related-stories {
-        margin-top: 14px;
+        margin-top: 8px;
     }
     .reader .related-stories > .section-bar {
-        margin-bottom: 10px;
+        margin-bottom: 6px;
+    }
+    .reader .related-stories > .section-bar h2 {
+        font-size: 17px;
     }
     .reader .related-stories .channel-grid {
-        gap: 12px;
+        gap: 8px;
+        margin: 0;
+    }
+    .reader .related-stories .reader-card {
+        padding: 8px;
+    }
+    .reader .related-stories .reader-card h3 {
+        font-size: 13.5px;
+        line-height: 1.3;
+        margin: 4px 0 3px;
+    }
+    .reader .related-stories .reader-card .story-meta {
+        margin-top: 4px;
+        font-size: 10.5px;
+    }
+    .reader .related-stories .reader-card time {
+        font-size: 10.5px;
     }
 }
+
+/* ==========================================================================
+   Article Stats Bar (Dibawah Gambar Hero)
+   ========================================================================== */
+.kr-article-stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    margin: 12px 0 18px 0;
+    background: var(--surface-2, #f8fafc);
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--muted, #64748b);
+}
+.kr-stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.2;
+    text-decoration: none;
+    color: inherit;
+}
+.kr-stat-value {
+    font-weight: 700;
+    color: var(--ink, #1e293b);
+}
+.kr-stat-label {
+    font-size: 12px;
+}
+.kr-stat-divider {
+    width: 1px;
+    height: 14px;
+    background: var(--line, #cbd5e1);
+}
+.kr-stat-interactive {
+    cursor: pointer;
+    transition: color 0.15s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+}
+.kr-stat-interactive:hover {
+    color: var(--accent, #b91c1c);
+}
+.kr-stat-interactive:hover .kr-stat-value {
+    color: var(--accent, #b91c1c);
+}
+.kr-stat-like-btn.is-active {
+    color: #b91c1c;
+}
+.kr-stat-like-btn.is-active .kr-icon-thumb {
+    fill: #b91c1c;
+    stroke: #b91c1c;
+}
+.kr-stat-like-btn.is-active .kr-stat-value {
+    color: #b91c1c;
+}
+
+@media (max-width: 480px) {
+    .kr-article-stats-bar {
+        padding: 8px 10px;
+        gap: 8px;
+        font-size: 12px;
+        margin: 10px 0 14px 0;
+    }
+    .kr-stat-label {
+        font-size: 11px;
+    }
+}
+
+/* ==========================================================================
+   Reaction Popup Modal (Scroll 85% / 30 Detik)
+   ========================================================================== */
+.kr-reaction-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.28s ease, visibility 0.28s ease;
+}
+.kr-reaction-modal.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+.kr-reaction-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+.kr-reaction-dialog {
+    position: relative;
+    z-index: 1;
+    background: var(--paper, #ffffff);
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 440px;
+    padding: 24px 22px;
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.24);
+    transform: scale(0.92) translateY(12px);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.kr-reaction-modal.is-open .kr-reaction-dialog {
+    transform: scale(1) translateY(0);
+}
+.kr-reaction-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--wash, #f1f5f9);
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    color: var(--muted, #64748b);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.kr-reaction-close:hover {
+    background: var(--line, #e2e8f0);
+    color: var(--ink, #0f172a);
+}
+.kr-reaction-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.kr-reaction-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(185, 28, 28, 0.08);
+    color: #b91c1c;
+    border-radius: 100px;
+    padding: 4px 12px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 10px;
+}
+.kr-reaction-title {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--ink, #0f172a);
+}
+.kr-reaction-article-title {
+    margin: 0 0 20px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--muted, #64748b);
+    font-style: italic;
+    max-width: 90%;
+}
+.kr-reaction-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+}
+.kr-reaction-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 12px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line, #cbd5e1);
+    background: var(--surface-2, #f8fafc);
+    color: var(--ink, #334155);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+.kr-reaction-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+.kr-reaction-btn:active {
+    transform: scale(0.97);
+}
+.kr-reaction-icon-box {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.kr-reaction-btn--like:hover {
+    border-color: #16a34a;
+    background: rgba(22, 163, 74, 0.04);
+}
+.kr-reaction-btn--like:hover .kr-reaction-icon-box {
+    background: #16a34a;
+    color: #ffffff;
+}
+.kr-reaction-btn--like.is-active {
+    border-color: #16a34a;
+    background: rgba(22, 163, 74, 0.1);
+    color: #15803d;
+}
+.kr-reaction-btn--like.is-active .kr-reaction-icon-box {
+    background: #16a34a;
+    color: #ffffff;
+}
+.kr-reaction-btn--dislike:hover {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.04);
+}
+.kr-reaction-btn--dislike:hover .kr-reaction-icon-box {
+    background: #dc2626;
+    color: #ffffff;
+}
+.kr-reaction-btn--dislike.is-active {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+    color: #b91c1c;
+}
+.kr-reaction-btn--dislike.is-active .kr-reaction-icon-box {
+    background: #dc2626;
+    color: #ffffff;
+}
+.kr-reaction-btn-text {
+    font-size: 13.5px;
+    font-weight: 700;
+}
+.kr-reaction-count {
+    font-size: 11.5px;
+    color: var(--muted, #64748b);
+}
+.kr-reaction-toast {
+    margin-top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 13px;
+    font-weight: 600;
+    animation: krPopIn 0.25s ease-out;
+}
+@keyframes krPopIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Dark Mode for Reaction */
+:root[data-theme='dark'] .kr-article-stats-bar,
+html[data-theme="dark"] .kr-article-stats-bar,
+html.dark .kr-article-stats-bar {
+    background: #141f2e;
+    border-color: #2e3a50;
+}
+:root[data-theme='dark'] .kr-stat-value,
+html[data-theme="dark"] .kr-stat-value,
+html.dark .kr-stat-value {
+    color: #f1f5f9;
+}
+:root[data-theme='dark'] .kr-reaction-dialog,
+html[data-theme="dark"] .kr-reaction-dialog,
+html.dark .kr-reaction-dialog {
+    background: #0f172a;
+    border-color: #334155;
+    box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.6);
+}
+:root[data-theme='dark'] .kr-reaction-title,
+html[data-theme="dark"] .kr-reaction-title,
+html.dark .kr-reaction-title {
+    color: #f1f5f9;
+}
+:root[data-theme='dark'] .kr-reaction-btn,
+html[data-theme="dark"] .kr-reaction-btn,
+html.dark .kr-reaction-btn {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+:root[data-theme='dark'] .kr-reaction-icon-box,
+html[data-theme="dark"] .kr-reaction-icon-box,
+html.dark .kr-reaction-icon-box {
+    background: #0f172a;
+    color: #cbd5e1;
+}
+:root[data-theme='dark'] .kr-reaction-close,
+html[data-theme="dark"] .kr-reaction-close,
+html.dark .kr-reaction-close {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+:root[data-theme='dark'] .kr-reaction-toast,
+html[data-theme="dark"] .kr-reaction-toast,
+html.dark .kr-reaction-toast {
+    background: #14532d;
+    color: #bbf7d0;
+}
+

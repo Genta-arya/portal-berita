@@ -46,6 +46,7 @@ Route::get('/cari', [PublicController::class, 'listing']);
 Route::get('/{kind}/{slug}', [PublicController::class, 'listing'])->where('kind', 'kanal|tag|penulis');
 Route::get('/berita/{id}/{slug}', [PublicController::class, 'article']);
 Route::post('/berita/{id}/view', [PublicController::class, 'view']);
+Route::post('/berita/{id}/react', [PublicController::class, 'react']);
 Route::get('/halaman/{slug}', [PublicController::class, 'page']);
 Route::get('/rss.xml',[PublicController::class, 'rss']);
 Route::get('/sitemap.xml',[PublicController::class, 'sitemap']);

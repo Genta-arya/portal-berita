@@ -44,6 +44,11 @@ class Article extends Model
         return $this->hasMany(ArticleRevision::class);
     }
 
+    public function reactions()
+    {
+        return $this->hasMany(ArticleReaction::class);
+    }
+
     public static function hashId(int $id): string
     {
         $salt = 0x5A3C9; // 369609
