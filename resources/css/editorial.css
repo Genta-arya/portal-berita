@@ -2074,11 +2074,14 @@
     z-index: 0;
 }
 
-.reader .kr-pill-icon {
-    display: inline-flex;
-    align-items: center;
+.reader .kr-pill-hash {
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1;
+    color: #fef08a;
     position: relative;
     z-index: 1;
+    margin-right: -1px;
 }
 
 .reader .kr-category-pill > span {
