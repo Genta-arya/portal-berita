@@ -5133,76 +5133,193 @@ html.dark .kr-google-login-btn:hover {
 }
 
 /* ==========================================================================
-   Article Stats Bar (Dibawah Gambar Hero)
+   Article Engagement Bar (Redesigned Modern Stats & Reaction Chips)
    ========================================================================== */
-.kr-article-stats-bar {
+.kr-article-engagement-bar {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 12px;
-    padding: 10px 14px;
-    margin: 12px 0 18px 0;
-    background: var(--surface-2, #f8fafc);
+    padding: 12px 16px;
+    margin: 14px 0 20px 0;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.8) 100%);
     border: 1px solid var(--line, #e2e8f0);
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--muted, #64748b);
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
-.kr-stat-item {
+.kr-engagement-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.kr-engagement-pill {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    line-height: 1.2;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: 100px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
     text-decoration: none;
-    color: inherit;
+    color: var(--muted, #64748b);
+    transition: transform 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
 }
-.kr-stat-value {
-    font-weight: 700;
+.kr-engagement-pill:hover {
+    transform: translateY(-1px);
+    border-color: #cbd5e1;
     color: var(--ink, #1e293b);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
 }
-.kr-stat-label {
-    font-size: 12px;
+.kr-pill-icon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--surface-2, #f1f5f9);
+    color: var(--forest, #15803d);
+    flex-shrink: 0;
 }
-.kr-stat-divider {
-    width: 1px;
-    height: 14px;
-    background: var(--line, #cbd5e1);
+.kr-engagement-pill--comments .kr-pill-icon {
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.08);
 }
-.kr-stat-interactive {
+.kr-engagement-pill--views .kr-pill-icon {
+    color: #b91c1c;
+    background: rgba(185, 28, 28, 0.08);
+}
+.kr-pill-data {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    line-height: 1.2;
+}
+.kr-pill-number {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: var(--ink, #0f172a);
+}
+.kr-pill-text {
+    font-size: 11.5px;
+    color: var(--muted, #64748b);
+    font-weight: 500;
+}
+
+/* Action Chips (Like / Dislike) */
+.kr-engagement-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.kr-action-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--line, #cbd5e1);
+    background: #ffffff;
+    color: var(--ink, #334155);
+    font-size: 12.5px;
+    font-weight: 700;
     cursor: pointer;
-    transition: color 0.15s ease;
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: all 0.15s ease;
 }
-.kr-stat-interactive:hover {
-    color: var(--accent, #b91c1c);
+.kr-action-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
-.kr-stat-interactive:hover .kr-stat-value {
-    color: var(--accent, #b91c1c);
+.kr-action-chip:active {
+    transform: scale(0.97);
 }
-.kr-stat-like-btn.is-active {
+.kr-chip-thumb {
+    flex-shrink: 0;
+    display: block;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.kr-action-chip:hover .kr-chip-thumb {
+    transform: scale(1.15);
+}
+.kr-chip-count {
+    background: var(--surface-2, #f1f5f9);
+    padding: 2px 7px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted, #475569);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Like Active State */
+.kr-action-chip--like:hover {
+    border-color: #16a34a;
+    color: #15803d;
+}
+.kr-action-chip--like.is-active {
+    background: #f0fdf4;
+    border-color: #16a34a;
+    color: #15803d;
+}
+.kr-action-chip--like.is-active .kr-chip-thumb {
+    fill: #16a34a;
+    stroke: #16a34a;
+}
+.kr-action-chip--like.is-active .kr-chip-count {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* Dislike Active State */
+.kr-action-chip--dislike:hover {
+    border-color: #dc2626;
     color: #b91c1c;
 }
-.kr-stat-like-btn.is-active .kr-icon-thumb {
-    fill: #b91c1c;
-    stroke: #b91c1c;
+.kr-action-chip--dislike.is-active {
+    background: #fef2f2;
+    border-color: #dc2626;
+    color: #b91c1c;
 }
-.kr-stat-like-btn.is-active .kr-stat-value {
+.kr-action-chip--dislike.is-active .kr-chip-thumb {
+    fill: #dc2626;
+    stroke: #dc2626;
+}
+.kr-action-chip--dislike.is-active .kr-chip-count {
+    background: #fee2e2;
     color: #b91c1c;
 }
 
-@media (max-width: 480px) {
-    .kr-article-stats-bar {
-        padding: 8px 10px;
-        gap: 8px;
-        font-size: 12px;
-        margin: 10px 0 14px 0;
+@media (max-width: 580px) {
+    .kr-article-engagement-bar {
+        padding: 10px 12px;
+        gap: 10px;
+        flex-direction: column;
+        align-items: stretch;
     }
-    .kr-stat-label {
-        font-size: 11px;
+    .kr-engagement-stats {
+        justify-content: space-between;
+        width: 100%;
+    }
+    .kr-engagement-pill {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 6px 10px;
+    }
+    .kr-engagement-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .kr-action-chip {
+        justify-content: center;
+        padding: 8px 10px;
     }
 }
+
 
 /* ==========================================================================
    Reaction Popup Modal (Scroll 85% / 30 Detik)
@@ -5400,16 +5517,71 @@ html.dark .kr-google-login-btn:hover {
 }
 
 /* Dark Mode for Reaction */
-:root[data-theme='dark'] .kr-article-stats-bar,
-html[data-theme="dark"] .kr-article-stats-bar,
-html.dark .kr-article-stats-bar {
-    background: #141f2e;
+:root[data-theme='dark'] .kr-article-engagement-bar,
+html[data-theme="dark"] .kr-article-engagement-bar,
+html.dark .kr-article-engagement-bar {
+    background: linear-gradient(135deg, #141f2e 0%, #0d1520 100%);
     border-color: #2e3a50;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
-:root[data-theme='dark'] .kr-stat-value,
-html[data-theme="dark"] .kr-stat-value,
-html.dark .kr-stat-value {
+:root[data-theme='dark'] .kr-engagement-pill,
+html[data-theme="dark"] .kr-engagement-pill,
+html.dark .kr-engagement-pill {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+:root[data-theme='dark'] .kr-pill-number,
+html[data-theme="dark"] .kr-pill-number,
+html.dark .kr-pill-number {
     color: #f1f5f9;
+}
+:root[data-theme='dark'] .kr-action-chip,
+html[data-theme="dark"] .kr-action-chip,
+html.dark .kr-action-chip {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+}
+:root[data-theme='dark'] .kr-chip-count,
+html[data-theme="dark"] .kr-chip-count,
+html.dark .kr-chip-count {
+    background: #0f172a;
+    color: #cbd5e1;
+}
+:root[data-theme='dark'] .kr-action-chip--like.is-active,
+html[data-theme="dark"] .kr-action-chip--like.is-active,
+html.dark .kr-action-chip--like.is-active {
+    background: #064e3b;
+    border-color: #10b981;
+    color: #6ee7b7;
+}
+:root[data-theme='dark'] .kr-action-chip--like.is-active .kr-chip-thumb,
+html[data-theme="dark"] .kr-action-chip--like.is-active .kr-chip-thumb {
+    fill: #10b981;
+    stroke: #10b981;
+}
+:root[data-theme='dark'] .kr-action-chip--like.is-active .kr-chip-count,
+html[data-theme="dark"] .kr-action-chip--like.is-active .kr-chip-count {
+    background: #022c22;
+    color: #6ee7b7;
+}
+:root[data-theme='dark'] .kr-action-chip--dislike.is-active,
+html[data-theme="dark"] .kr-action-chip--dislike.is-active,
+html.dark .kr-action-chip--dislike.is-active {
+    background: #7f1d1d;
+    border-color: #ef4444;
+    color: #fca5a5;
+}
+:root[data-theme='dark'] .kr-action-chip--dislike.is-active .kr-chip-thumb,
+html[data-theme="dark"] .kr-action-chip--dislike.is-active .kr-chip-thumb {
+    fill: #ef4444;
+    stroke: #ef4444;
+}
+:root[data-theme='dark'] .kr-action-chip--dislike.is-active .kr-chip-count,
+html[data-theme="dark"] .kr-action-chip--dislike.is-active .kr-chip-count {
+    background: #450a0a;
+    color: #fca5a5;
 }
 :root[data-theme='dark'] .kr-reaction-dialog,
 html[data-theme="dark"] .kr-reaction-dialog,

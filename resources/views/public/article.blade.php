@@ -132,36 +132,52 @@
                 </figure>
             @endif
 
-            {{-- Statistik Berita di Bawah Gambar (Views, Komentar, Suka) --}}
-            <div class="kr-article-stats-bar" aria-label="Statistik Artikel">
-                <div class="kr-stat-item" title="Jumlah Tayangan">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                    <span class="kr-stat-value" id="krStatViews">{{ number_format($totalViews ?? 0, 0, ',', '.') }}</span>
-                    <span class="kr-stat-label">kali dibaca</span>
+            {{-- Redesign Statistik Berita di Bawah Gambar (Pill Cards Modern) --}}
+            <div class="kr-article-engagement-bar" aria-label="Statistik dan Interaksi Artikel">
+                <div class="kr-engagement-stats">
+                    <div class="kr-engagement-pill kr-engagement-pill--views" title="Jumlah Pembaca">
+                        <span class="kr-pill-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                        <div class="kr-pill-data">
+                            <strong class="kr-pill-number" id="krStatViews">{{ number_format($totalViews ?? 0, 0, ',', '.') }}</strong>
+                            <span class="kr-pill-text">Views</span>
+                        </div>
+                    </div>
+
+                    <a href="#comments" class="kr-engagement-pill kr-engagement-pill--comments" title="Lihat Komentar">
+                        <span class="kr-pill-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        </span>
+                        <div class="kr-pill-data">
+                            <strong class="kr-pill-number" id="krStatComments">0</strong>
+                            <span class="kr-pill-text">Komentar</span>
+                        </div>
+                    </a>
                 </div>
 
-                <div class="kr-stat-divider" aria-hidden="true"></div>
+                <div class="kr-engagement-actions">
+                    <button type="button" class="kr-action-chip kr-action-chip--like" id="krInlineLikeBtn" title="Suka artikel ini" data-reaction="like">
+                        <svg class="kr-chip-thumb" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                        </svg>
+                        <span class="kr-chip-label">Suka</span>
+                        <span class="kr-chip-count" id="krStatLikes">{{ number_format($likesCount ?? 0, 0, ',', '.') }}</span>
+                    </button>
 
-                <a href="#comments" class="kr-stat-item kr-stat-interactive" title="Lihat Komentar">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span class="kr-stat-value" id="krStatComments">0</span>
-                    <span class="kr-stat-label">komentar</span>
-                </a>
-
-                <div class="kr-stat-divider" aria-hidden="true"></div>
-
-                <button type="button" class="kr-stat-item kr-stat-interactive kr-stat-like-btn" id="krInlineLikeBtn" title="Sukai berita ini" data-reaction="like">
-                    <svg class="kr-icon-thumb" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
-                    </svg>
-                    <span class="kr-stat-value" id="krStatLikes">{{ number_format($likesCount ?? 0, 0, ',', '.') }}</span>
-                    <span class="kr-stat-label">suka</span>
-                </button>
+                    <button type="button" class="kr-action-chip kr-action-chip--dislike" id="krInlineDislikeBtn" title="Tidak suka artikel ini" data-reaction="dislike">
+                        <svg class="kr-chip-thumb" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path>
+                        </svg>
+                        <span class="kr-chip-label">Tidak Suka</span>
+                        <span class="kr-chip-count" id="krStatDislikes">{{ number_format($dislikesCount ?? 0, 0, ',', '.') }}</span>
+                    </button>
+                </div>
             </div>
 
             @php
@@ -906,7 +922,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const modalDislikeCount = document.getElementById('krModalDislikeCount');
         const reactionToast = document.getElementById('krReactionToast');
         const inlineLikeBtn = document.getElementById('krInlineLikeBtn');
+        const inlineDislikeBtn = document.getElementById('krInlineDislikeBtn');
         const statLikes = document.getElementById('krStatLikes');
+        const statDislikes = document.getElementById('krStatDislikes');
 
         if (!reactionModal) return;
 
@@ -939,9 +957,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (modalLikeBtn) modalLikeBtn.classList.add('is-active');
                 if (modalDislikeBtn) modalDislikeBtn.classList.remove('is-active');
                 if (inlineLikeBtn) inlineLikeBtn.classList.add('is-active');
+                if (inlineDislikeBtn) inlineDislikeBtn.classList.remove('is-active');
             } else if (reaction === 'dislike') {
                 if (modalDislikeBtn) modalDislikeBtn.classList.add('is-active');
                 if (modalLikeBtn) modalLikeBtn.classList.remove('is-active');
+                if (inlineDislikeBtn) inlineDislikeBtn.classList.add('is-active');
                 if (inlineLikeBtn) inlineLikeBtn.classList.remove('is-active');
             }
         }
@@ -1017,6 +1037,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (modalLikeCount) modalLikeCount.textContent = '(' + data.likes_count + ')';
                     if (modalDislikeCount) modalDislikeCount.textContent = '(' + data.dislikes_count + ')';
                     if (statLikes) statLikes.textContent = data.likes_count.toLocaleString('id-ID');
+                    if (statDislikes) statDislikes.textContent = data.dislikes_count.toLocaleString('id-ID');
 
                     if (reactionToast) {
                         reactionToast.style.display = 'flex';
@@ -1050,6 +1071,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (inlineLikeBtn) {
             inlineLikeBtn.addEventListener('click', function() {
                 sendReaction('like');
+            });
+        }
+
+        if (inlineDislikeBtn) {
+            inlineDislikeBtn.addEventListener('click', function() {
+                sendReaction('dislike');
             });
         }
     })();
