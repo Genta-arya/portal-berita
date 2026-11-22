@@ -13,9 +13,9 @@
                             <span class="pulse-beacon-ring"></span>
                             <span class="pulse-beacon-dot"></span>
                         </span>
-                        Trending Kategori
+                        Trending Topik
                     </span>
-                    <h2 class="sr-only">Trending Kategori</h2>
+                    <h2 class="sr-only">Trending Topik</h2>
                 </div>
                 <div class="topic-shelf-controls">
                     <button type="button" class="topic-nav-btn" data-topic-prev aria-label="Geser topik ke kiri" title="Sebelumnya">
@@ -116,10 +116,10 @@
         <section class="channel-section" aria-label="Kanal Berita">
             {{-- KATEGORI 1: FLEX SLIDE FULL-WIDTH --}}
             @if($firstChannel)
-                <section class="channel-block channel-block--flex-slide" data-flex-slider aria-label="Kategori Utama: {{ $firstChannel->name }}">
+                <section class="channel-block channel-block--flex-slide" data-flex-slider aria-label="Topik Utama: {{ $firstChannel->name }}">
                     <div class="channel-flex-header">
                         <div class="channel-flex-title-wrap">
-                            <span class="channel-flex-pill">Kategori Utama</span>
+                            <span class="channel-flex-pill">Topik Utama</span>
                             <h3><a href="/kanal/{{ $firstChannel->slug }}">{{ $firstChannel->name }}</a></h3>
                         </div>
                         <div class="channel-flex-controls">

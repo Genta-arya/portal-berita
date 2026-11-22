@@ -1,2 +1,49 @@
+# ==============================================================================
+# KAPUAS RAYA - ROBOTS.TXT
+# Mengizinkan Googlebot & Mesin Pencari Resmi untuk Pengindeksan Maksimal
+# Memblokir Scraper Bot, AI Content Harvester, & Rippers
+# ==============================================================================
+
+# 1. Izinkan penuh Googlebot & Search Engine Resmi
+User-agent: Googlebot
+User-agent: Googlebot-News
+User-agent: Googlebot-Image
+User-agent: Googlebot-Video
+User-agent: Mediapartners-Google
+User-agent: AdsBot-Google
+User-agent: Bingbot
+User-agent: Slurp
+User-agent: DuckDuckBot
+User-agent: Baiduspider
+User-agent: Yandex
+Disallow: /admin/
+Disallow: /cari
+Disallow: /login
+Disallow: /api/
+
+# 2. Blokir Bot Pencuri Konten, Aggressive Scrapers & AI Harvesters
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: CCBot
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: Bytespider
+User-agent: BLEXBot
+User-agent: DataForSeoBot
+User-agent: PetalBot
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+User-agent: MJ12bot
+User-agent: Scrapy
+Disallow: /
+
+# 3. Default Rule untuk crawler umum lainnya
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /cari
+Disallow: /login
+Disallow: /api/
+
+Sitemap: https://kapuasraya.com/sitemap.xml

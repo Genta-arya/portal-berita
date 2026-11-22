@@ -33,10 +33,39 @@ class PublicController extends Controller
 
     public function listing(Request $r, ?string $kind = null, ?string $slug = null)
     {
-        $r->validate(['page' => 'nullable|integer|min:1|max:100000', 'q' => 'nullable|string|max:100', 'category_id' => 'nullable|integer']);
+        $r->validate([
+            'page' => 'nullable|integer|min:1|max:100000',
+            'q' => 'nullable|string|max:100',
+            'category_id' => 'nullable|integer',
+            'tanggal' => 'nullable|date_format:Y-m-d',
+            'tahun' => 'nullable|integer|min:2000|max:2099',
+            'bulan' => 'nullable|integer|min:1|max:12',
+        ]);
         $q = Article::published()->with(['author', 'category']);
         $title = 'Berita terbaru';
         $description = 'Kabar terbaru dari ruang redaksi.';
+
+        if ($r->is('arsip')) {
+            $title = 'Arsip Berita';
+            $description = 'Telusuri dokumentasi dan arsip pemberitaan berdasarkan waktu penerbitan.';
+        }
+
+        if ($r->filled('tanggal')) {
+            $q->whereDate('published_at', $r->input('tanggal'));
+            $title = 'Arsip: ' . \Carbon\Carbon::parse($r->input('tanggal'))->locale('id')->translatedFormat('d F Y');
+            $description = 'Kumpulan berita yang diterbitkan pada ' . \Carbon\Carbon::parse($r->input('tanggal'))->locale('id')->translatedFormat('l, d F Y') . '.';
+        } elseif ($r->filled('tahun')) {
+            $q->whereYear('published_at', $r->integer('tahun'));
+            if ($r->filled('bulan')) {
+                $q->whereMonth('published_at', $r->integer('bulan'));
+                $monthName = \Carbon\Carbon::createFromDate($r->integer('tahun'), $r->integer('bulan'), 1)->locale('id')->translatedFormat('F Y');
+                $title = 'Arsip: ' . $monthName;
+                $description = 'Kumpulan berita yang diterbitkan pada bulan ' . $monthName . '.';
+            } else {
+                $title = 'Arsip Tahun ' . $r->integer('tahun');
+                $description = 'Kumpulan berita yang diterbitkan sepanjang tahun ' . $r->integer('tahun') . '.';
+            }
+        }
         if ($kind === 'kanal') {
             $entity = Category::where('slug', $slug)->where('active', true)->firstOrFail();
             $q->where('category_id', $entity->id);
@@ -72,7 +101,7 @@ class PublicController extends Controller
 
         $filterCategories = collect();
         $selectedCategory = null;
-        if ($r->is('terbaru')) {
+        if ($r->is('terbaru') || $r->is('arsip')) {
             $selectedCategoryId = (int) $r->input('category_id');
             if ($selectedCategoryId > 0) {
                 $selectedCategory = Category::find($selectedCategoryId);
@@ -88,7 +117,30 @@ class PublicController extends Controller
             });
         }
 
-        return view('public.list', compact('articles', 'title', 'description', 'filterCategories', 'selectedCategory'));
+        // Ambil berita trending (berdasarkan view harian 7 hari terakhir atau fallback terpopuler/terbaru)
+        $trendingArticles = Cache::remember('site:listing_trending', 300, function () {
+            $popular = Article::published()->with('category')
+                ->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(7)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')
+                ->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')
+                ->limit(5)->get(['articles.*', 'v.total']);
+
+            if ($popular->isEmpty()) {
+                $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
+            }
+
+            return $popular;
+        });
+
+        // Ambil berita pilihan/lainnya untuk sidebar widget
+        $otherArticles = Cache::remember('site:listing_others', 300, function () use ($trendingArticles) {
+            return Article::published()->with('category')
+                ->whereNotIn('id', $trendingArticles->pluck('id'))
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        });
+
+        return view('public.list', compact('articles', 'title', 'description', 'filterCategories', 'selectedCategory', 'trendingArticles', 'otherArticles'));
     }
 
     public function article(Request $r, int $id, string $slug)
@@ -102,7 +154,30 @@ class PublicController extends Controller
         }
         $related = Article::published()->where('id', '!=', $id)->where(fn ($q) => $q->where('category_id', $article->category_id)->orWhereHas('tags', fn ($q) => $q->whereIn('tags.id', $article->tags->pluck('id'))))->latest('published_at')->limit(6)->get();
 
-        return view('public.article', compact('article', 'related'));
+        // Ambil berita trending untuk sidebar detail artikel
+        $trendingArticles = Cache::remember('site:listing_trending', 300, function () {
+            $popular = Article::published()->with('category')
+                ->joinSub(DB::table('article_view_daily')->selectRaw('article_id,SUM(views) as total')->where('date', '>=', now()->subDays(7)->toDateString())->groupBy('article_id'), 'v', 'articles.id', '=', 'v.article_id')
+                ->orderByDesc('total')->orderByDesc('articles.published_at')->orderByDesc('articles.id')
+                ->limit(5)->get(['articles.*', 'v.total']);
+
+            if ($popular->isEmpty()) {
+                $popular = Article::published()->with('category')->latest('published_at')->latest('id')->limit(5)->get();
+            }
+
+            return $popular;
+        });
+
+        // Ambil berita pilihan/lainnya untuk sidebar detail artikel
+        $otherArticles = Cache::remember('site:listing_others', 300, function () use ($trendingArticles) {
+            return Article::published()->with('category')
+                ->whereNotIn('id', $trendingArticles->pluck('id'))
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        });
+
+        return view('public.article', compact('article', 'related', 'trendingArticles', 'otherArticles'));
     }
 
     public function view(Request $r, int $id)
@@ -121,6 +196,44 @@ class PublicController extends Controller
         }
 
         return response()->noContent();
+    }
+
+    public function searchSuggest(Request $r)
+    {
+        $q = trim((string) $r->input('q', ''));
+        if (mb_strlen($q) < 2) {
+            return response()->json(['articles' => [], 'topics' => []]);
+        }
+
+        $articles = Article::published()->with('category')
+            ->where(function ($query) use ($q) {
+                $query->where('title', 'like', "%{$q}%")
+                      ->orWhere('summary', 'like', "%{$q}%");
+            })
+            ->latest('published_at')
+            ->limit(6)
+            ->get(['id', 'title', 'slug', 'category_id', 'published_at', 'hero_media_id'])
+            ->map(function ($a) {
+                return [
+                    'id' => $a->id,
+                    'title' => $a->title,
+                    'url' => $a->url,
+                    'category' => $a->category?->name,
+                    'published' => $a->published_at?->locale('id')->diffForHumans(),
+                    'image' => $a->hero_media_id ? "/media/{$a->hero_media_id}/480" : null,
+                ];
+            });
+
+        $topics = Category::where('active', true)
+            ->where('name', 'like', "%{$q}%")
+            ->orderBy('name')
+            ->limit(5)
+            ->get(['id', 'name', 'slug']);
+
+        return response()->json([
+            'articles' => $articles,
+            'topics' => $topics,
+        ]);
     }
 
     public function searchCategories(Request $r)
