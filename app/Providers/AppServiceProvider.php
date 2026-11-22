@@ -35,7 +35,18 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('tickerArticles', $tickerArticles);
                 $view->with('tickerIsBreaking', $activeBreaking->isNotEmpty());
                 $view->with('tickerItems', $activeBreaking->isNotEmpty()
-                    ? $activeBreaking->map(fn ($item) => (object)['title'=>$item->text,'url'=>$item->url])
+                    ? $activeBreaking->map(function ($item) {
+                        $url = $item->url;
+                        if (!empty($url)) {
+                            // Strip any localhost or domain so it's safely relative or domain-aware
+                            $url = preg_replace('#^https?://[^/]+#', '', $url);
+                            if (preg_match('#^/berita/(\d+)(/.*)?$#', $url, $m)) {
+                                $hashId = \App\Services\HashIdService::encode((int)$m[1]);
+                                $url = '/berita/' . $hashId . ($m[2] ?? '');
+                            }
+                        }
+                        return (object)['title' => $item->text, 'url' => $url];
+                    })
                     : $tickerArticles);
 
                 $view->with('archiveMonths', Cache::remember('site:archive_months', 600, function () {
