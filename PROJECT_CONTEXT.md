@@ -3,7 +3,7 @@
 ## Tech Stack
 - **Framework**: Laravel 12.x (PHP 8.5+)
 - **Frontend**: Blade Templates, Vanilla CSS (`editorial.css`), Vite 7.x
-- **Database**: MySQL Remote (`server.hostdata.id`)
+- **Database**: MySQL VPS Remote (`51.79.152.173:3306`, database `db_kapuasraya`)
 - **Storage**: Local private disk (`storage/app/private/editorial`) with `/media/{id}/{variant}` serving logic
 
 ## Arsitektur Media & Gambar

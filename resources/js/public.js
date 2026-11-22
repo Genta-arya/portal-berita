@@ -94,9 +94,12 @@ if (carousel) {
 }
 const categoryDropdown = document.querySelector('[data-category-dropdown]');
 if(categoryDropdown){
- document.addEventListener('click',event=>{if(!categoryDropdown.contains(event.target))categoryDropdown.open=false;});
+ document.addEventListener('click',event=>{
+   if(categoryDropdown.open && !categoryDropdown.contains(event.target)) {
+     categoryDropdown.open=false;
+   }
+ });
  categoryDropdown.addEventListener('keydown',event=>{if(event.key==='Escape'){categoryDropdown.open=false;categoryDropdown.querySelector('summary').focus();}});
- categoryDropdown.addEventListener('focusout',event=>{if(event.relatedTarget&&!categoryDropdown.contains(event.relatedTarget))categoryDropdown.open=false;});
 }
 const latestTicker=document.querySelector('[data-latest-ticker]');
 if(latestTicker){
