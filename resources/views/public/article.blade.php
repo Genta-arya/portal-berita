@@ -94,7 +94,69 @@
                 </figure>
             @endif
 
-            <div class="prose" id="krArticleProse">{!! $article->body !!}</div>
+            @php
+                $renderedBody = $article->body;
+                if ($related->isNotEmpty()) {
+                    // Split content by closing paragraph tags
+                    $parts = preg_split('/(<\/p>)/i', $renderedBody, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    $paragraphs = [];
+                    $totalParts = count($parts);
+                    for ($i = 0; $i < $totalParts - 1; $i += 2) {
+                        $paragraphs[] = $parts[$i] . $parts[$i + 1];
+                    }
+                    if ($totalParts % 2 === 1 && trim($parts[$totalParts - 1]) !== '') {
+                        $paragraphs[] = $parts[$totalParts - 1];
+                    }
+
+                    $totalP = count($paragraphs);
+                    $inlineItems = $related->take(3)->values();
+                    $numItems = $inlineItems->count();
+
+                    if ($totalP >= 2 && $numItems > 0) {
+                        // Distribute up to 3 cards evenly inside article body
+                        if ($numItems === 1) {
+                            $positions = [max(1, (int) floor($totalP / 2))];
+                        } elseif ($numItems === 2) {
+                            $positions = [max(1, (int) floor($totalP / 3)), max(2, (int) floor((2 * $totalP) / 3))];
+                        } else {
+                            if ($totalP >= 6) {
+                                $positions = [
+                                    max(1, (int) floor($totalP / 4)),
+                                    max(2, (int) floor((2 * $totalP) / 4)),
+                                    max(3, (int) floor((3 * $totalP) / 4))
+                                ];
+                            } elseif ($totalP >= 4) {
+                                $positions = [1, 2, 3];
+                            } elseif ($totalP === 3) {
+                                $positions = [1, 2];
+                            } else {
+                                $positions = [1];
+                            }
+                        }
+
+                        $insertMap = [];
+                        foreach ($positions as $idx => $pos) {
+                            if (isset($inlineItems[$idx])) {
+                                $insertMap[$pos][] = $inlineItems[$idx];
+                            }
+                        }
+
+                        $newBody = '';
+                        foreach ($paragraphs as $pIndex => $pContent) {
+                            $newBody .= $pContent;
+                            $curNumber = $pIndex + 1;
+                            if (isset($insertMap[$curNumber])) {
+                                foreach ($insertMap[$curNumber] as $relItem) {
+                                    $newBody .= view('public.partials.inline-related', ['relItem' => $relItem])->render();
+                                }
+                            }
+                        }
+                        $renderedBody = $newBody;
+                    }
+                }
+            @endphp
+
+            <div class="prose" id="krArticleProse">{!! $renderedBody !!}</div>
 
             <div class="tags">
                 @foreach($article->tags as $tag)
@@ -363,8 +425,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Juga pasang click listener ke gambar di dalam body artikel (.prose img)
-    const proseImages = document.querySelectorAll('.prose img');
+    // Juga pasang click listener ke gambar di dalam body artikel (.prose img), kecualikan inline related
+    const proseImages = document.querySelectorAll('.prose img:not(.kr-inline-related-thumb img)');
     proseImages.forEach(function(img) {
         img.style.cursor = 'zoom-in';
         img.title = 'Klik untuk memperbesar gambar';
@@ -488,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function prepareSentenceSpans() {
             if (sentenceSpans.length > 0) return;
 
-            const paragraphs = articleProse.querySelectorAll('p, blockquote, li');
+            const paragraphs = articleProse.querySelectorAll('p:not(.kr-inline-related-p), blockquote, li');
             let spanId = 0;
 
             paragraphs.forEach(function(p) {
