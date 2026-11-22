@@ -3529,15 +3529,15 @@ body.kr-modal-opened {
 .kr-search-header-bar {
     border-bottom: 1px solid #e2e8f0;
     background: #ffffff;
-    padding: 16px 0;
+    padding: 10px 0;
     flex-shrink: 0;
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.04);
 }
 
 .kr-search-header-inner {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
 }
 
 .kr-search-dialog-form {
@@ -3546,16 +3546,16 @@ body.kr-modal-opened {
     align-items: center;
     flex: 1;
     background: #f8fafc;
-    border: 2px solid #cbd5e1;
-    border-radius: 12px;
-    padding: 4px 6px 4px 14px;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 2px 14px 2px 14px;
     transition: all 0.2s ease;
 }
 
 .kr-search-dialog-form:focus-within {
     border-color: #dc2626;
     background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .kr-search-dialog-icon {
@@ -3574,8 +3574,8 @@ body.kr-modal-opened {
     flex: 1;
     border: 0 !important;
     background: transparent !important;
-    padding: 10px 4px !important;
-    font-size: 16px !important;
+    padding: 7px 4px !important;
+    font-size: 14.5px !important;
     font-weight: 500;
     color: #0f172a !important;
     outline: none !important;
@@ -3587,41 +3587,25 @@ body.kr-modal-opened {
     color: #94a3b8;
 }
 
-.kr-search-clear-btn {
+.kr-search-back-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #e2e8f0;
-    color: #475569;
-    border: 0;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    width: 36px;
+    height: 36px;
     padding: 0;
-    cursor: pointer;
-    margin-right: 8px;
-    flex-shrink: 0;
-    transition: background 0.15s;
-}
-
-.kr-search-clear-btn:hover {
-    background: #cbd5e1;
-    color: #0f172a;
-}
-
-.kr-search-submit-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #dc2626;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 8px 18px;
-    border: 0;
     border-radius: 8px;
     cursor: pointer;
     flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.kr-search-back-btn:hover {
+    background: #e2e8f0;
+    color: #0f172a;
 }
 
 /* Disable browser native search clear buttons that cause duplicate 'x' */

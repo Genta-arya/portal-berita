@@ -19,9 +19,6 @@
                         </svg>
                     </span>
                     <input type="text" id="krSearchModalInput" name="q" class="kr-search-input-field" placeholder="Ketik kata kunci berita, tokoh, atau topik..." autocomplete="off" spellcheck="false" maxlength="100">
-                    <button type="submit" class="kr-search-submit-btn">
-                        <span>Cari</span>
-                    </button>
                 </form>
             </div>
         </div>
