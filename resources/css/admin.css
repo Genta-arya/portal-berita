@@ -59,3 +59,24 @@ body.admin{--forest:#b91c1c;--accent:#b91c1c;--ink:#303b4b;--muted:#8b96a6;--lin
 .admin .avatar-remove{display:flex;align-items:center;flex-direction:row;gap:7px;margin-top:10px;font-size:11px;font-weight:400}
 @media(max-width:500px){.avatar-upload{align-items:start;flex-direction:column}.avatar-upload-fields{width:100%}.profile-card{padding:20px}}
 .article-author>span{overflow:hidden}.article-author img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Modern Hero Image Card in Editor */
+.editor-hero-card{display:flex;align-items:center;gap:24px;padding:20px;border:1px solid #e2e8f0;background:#f8fafc;border-radius:12px;margin-bottom:22px;transition:border-color .2s}
+.editor-hero-card:hover{border-color:#cbd5e1}
+.editor-hero-preview{width:160px;height:105px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#edf2f7;border:1px solid #e2e8f0;display:grid;place-items:center;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+.editor-hero-preview img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}
+.editor-hero-card:hover .editor-hero-preview img{transform:scale(1.03)}
+.editor-hero-placeholder{display:flex;flex-direction:column;align-items:center;gap:6px;color:#94a3b8;font-size:11px;font-weight:500;text-align:center;padding:10px}
+.editor-hero-placeholder svg{color:#cbd5e1}
+.editor-hero-actions{display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;flex:1}
+.admin .editor-upload-btn{min-height:38px;padding:8px 18px;font-size:12.5px;font-weight:600;background:#b91c1c;border-radius:8px;box-shadow:0 1px 3px rgba(185,28,28,0.25)}
+.admin .editor-upload-btn:hover{background:#991b1b}
+.admin .editor-library-btn{min-height:36px;padding:7px 15px;font-size:12px;font-weight:500;border-radius:8px;background:#ffffff;border:1px solid #cbd5e1;color:#475569}
+.admin .editor-library-btn:hover{background:#f1f5f9;color:#1e293b;border-color:#94a3b8}
+.editor-hero-tip{font-size:11px;color:#94a3b8;margin:2px 0 0;line-height:1.4}
+@media(max-width:700px){
+  .editor-hero-card{flex-direction:column;align-items:stretch;gap:16px;padding:16px}
+  .editor-hero-preview{width:100%;height:170px}
+  .editor-hero-actions{align-items:stretch}
+  .admin .editor-upload-btn,.admin .editor-library-btn{width:100%;justify-content:center}
+}

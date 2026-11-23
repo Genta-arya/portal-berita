@@ -80,7 +80,33 @@ function Editor({initial,categories}) {
  <div className="editor-grid"><div className="editor-canvas">
  <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Naskah berita</h2><p>Mulai dengan judul yang jelas dan cerita yang bermakna.</p></div></div><fieldset disabled={!initial.editable||busy}>{field('title','Judul artikel')}{field('summary','Ringkasan berita','textarea')}<label>Isi berita</label><div ref={mount} className="jodit-newsroom"/><div className="writing-stats"><span>{words.toLocaleString('id-ID')} kata</span><span>{Math.max(1,Math.ceil(words/200))} menit baca</span><span>Ctrl+B tebal &middot; Ctrl+I miring</span></div></fieldset></section>
  {media.length>0&&<section className="workspace-card editor-section" role="region" aria-label="Pilih gambar"><div className="section-intro"><h2>{mediaMode==='hero'?'Pilih gambar utama':'Sisipkan gambar'}</h2><button className="button-secondary" type="button" onClick={()=>setMedia([])}>Tutup</button></div><div className="media-picker">{media.map(m=><button className="media-choice" type="button" key={m.id} onClick={()=>insertImage(m)}><img src={`/media/${m.id}/480`} alt={m.alt}/><span>{m.name}</span></button>)}</div></section>}
- <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Gambar utama</h2><p>Gambar pembuka yang tampil bersama artikel.</p></div></div><fieldset disabled={!initial.editable||busy}><div className="editor-hero-picker">{data.hero_media_id?<img src={`/media/${data.hero_media_id}/480`} alt={data.hero_alt||''}/>:<span>Belum ada gambar utama</span>}<div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap',alignItems:'center'}}><input type="file" ref={fileInputRef} accept="image/*" style={{display:'none'}} onChange={e=>uploadDirect(e.target.files?.[0])}/><button type="button" className="button" onClick={()=>fileInputRef.current?.click()}>+ Upload Gambar Langsung</button><button type="button" className="button-secondary" onClick={()=>loadMedia('hero')}>Pilih dari pustaka</button></div></div><div className="form-grid">{field('hero_alt','Deskripsi gambar (alt - otomatis dari judul)')}{field('hero_credit','Kredit / sumber (otomatis Redaksi)')}{field('hero_caption','Caption gambar (opsional)','textarea')}</div></fieldset></section>
+ <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Gambar utama</h2><p>Gambar pembuka yang tampil bersama artikel.</p></div></div><fieldset disabled={!initial.editable||busy}>
+   <div className="editor-hero-card">
+     <div className="editor-hero-preview">
+       {data.hero_media_id ? (
+         <img src={`/media/${data.hero_media_id}/480`} alt={data.hero_alt||''} />
+       ) : (
+         <div className="editor-hero-placeholder">
+           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+           <span>Belum ada gambar terpilih</span>
+         </div>
+       )}
+     </div>
+     <div className="editor-hero-actions">
+       <input type="file" ref={fileInputRef} accept="image/*" style={{display:'none'}} onChange={e=>uploadDirect(e.target.files?.[0])}/>
+       <button type="button" className="button editor-upload-btn" onClick={()=>fileInputRef.current?.click()}>
+         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+         Upload Gambar Langsung
+       </button>
+       <button type="button" className="button-secondary editor-library-btn" onClick={()=>loadMedia('hero')}>
+         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+         Pilih dari pustaka
+       </button>
+       <p className="editor-hero-tip">Format JPG, PNG, atau WEBP. Maks 10 MB.</p>
+     </div>
+   </div>
+   <div className="form-grid">{field('hero_alt','Deskripsi gambar (alt - otomatis dari judul)')}{field('hero_credit','Kredit / sumber (otomatis Redaksi)')}{field('hero_caption','Caption gambar (opsional)','textarea')}</div>
+ </fieldset></section>
  </div><aside className="editor-sidebar">
  <section className="workspace-card editor-section"><div className="section-intro"><h2>Detail artikel</h2></div><fieldset disabled={!initial.editable||busy}><label>Topik<select value={data.category_id??''} onChange={e=>update('category_id',e.target.value)}><option value="">Pilih topik</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>{field('tags','Tag') }<small className="field-hint">Pisahkan tag dengan koma.</small>{field('guest_author','Penulis tamu')}{field('slug','Slug artikel')}<label className="checkbox-label"><input type="checkbox" checked={!!data.sponsored} onChange={e=>update('sponsored',e.target.checked)}/> Artikel bersponsor</label></fieldset></section>
  <section className="workspace-card editor-section"><details className="editor-disclosure"><summary>Optimasi pencarian (SEO)</summary><fieldset disabled={!initial.editable||busy}>{field('seo_title','Judul SEO')}{field('seo_description','Deskripsi SEO','textarea')}</fieldset></details></section>
