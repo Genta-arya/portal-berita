@@ -8,6 +8,7 @@ import 'jodit/esm/plugins/source/source.js';
 import 'jodit/esm/plugins/clean-html/clean-html.js';
 import 'jodit/esm/plugins/paste/paste.js';
 import 'jodit/esm/plugins/paste-from-word/paste-from-word.js';
+import 'jodit/esm/plugins/justify/justify.js';
 import 'jodit/esm/plugins/video/config.js';
 import 'jodit/es2021/jodit.min.css';
 
@@ -18,7 +19,7 @@ function Editor({initial,categories}) {
  const loadMedia=async(mode='body')=>{setMediaMode(mode);try{const r=await fetch('/admin/media',{headers:{Accept:'application/json'}});if(!r.ok)throw new Error();setMedia((await r.json()).data);}catch{setMessage('Media tidak dapat dimuat.');}};
  useEffect(()=>{
   const host=document.createElement('textarea');host.value=initial.body??'';mount.current.appendChild(host);
-  const buttons=['undo','redo','|','paragraph','bold','italic','underline','strikethrough','|','ul','ol','|','link',{name:'newsMedia',icon:'image',tooltip:'Pilih gambar dari media',exec:j=>{j.s.save();loadMedia();}},{name:'newsVideo',icon:'video',tooltip:'Video YouTube',exec:j=>{
+  const buttons=['undo','redo','|','paragraph','bold','italic','underline','strikethrough','|','left','center','right','justify','|','ul','ol','|','link',{name:'newsMedia',icon:'image',tooltip:'Pilih gambar dari media',exec:j=>{j.s.save();loadMedia();}},{name:'newsVideo',icon:'video',tooltip:'Video YouTube',exec:j=>{
     j.s.save();const url=window.prompt('URL video YouTube');if(!url)return;
     try{const u=new URL(url);const id=u.hostname==='youtu.be'?u.pathname.slice(1):['youtube.com','www.youtube.com','www.youtube-nocookie.com'].includes(u.hostname)?(u.searchParams.get('v')??u.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})$/)?.[1]):null;if(!/^[A-Za-z0-9_-]{11}$/.test(id??''))throw new Error();j.s.restore();j.s.insertHTML(`<iframe src="https://www.youtube-nocookie.com/embed/${id}" width="560" height="315" title="Video YouTube"></iframe><p><br></p>`);}catch{setMessage('Masukkan URL YouTube yang valid.');}
   }},'table','|','eraser','find','fullsize','preview','source'];
