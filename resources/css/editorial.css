@@ -5639,84 +5639,131 @@ html.dark .kr-reaction-toast {
 }
 
 /* ==========================================================================
-   Mobile Floating Follow Social Bar (Bawah Tengah)
+   Floating Follow Social Bar (Desktop & Mobile Bawah Tengah)
    ========================================================================== */
-.kr-mobile-floating-follow {
-    display: none;
+.kr-floating-follow {
+    display: block;
+    position: fixed;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 998;
+    max-width: calc(100vw - 32px);
+    pointer-events: auto;
+    animation: krFloatSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.kr-floating-follow-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px 7px 10px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 100px;
+    box-shadow: 0 10px 30px -4px rgba(0, 0, 0, 0.35), 0 3px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kr-floating-follow-inner:hover {
+    box-shadow: 0 14px 36px -4px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Follow Label with Fire/Heart Pulse Effect */
+.kr-floating-follow-label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 100px;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
+    line-height: 1;
+    flex-shrink: 0;
+    animation: krFollowPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+.kr-floating-follow-label svg {
+    display: block;
+    animation: krHeartBeat 1.4s ease-in-out infinite;
+}
+
+@keyframes krFollowPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7), 0 2px 8px rgba(220, 38, 38, 0.5);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0), 0 4px 14px rgba(220, 38, 38, 0.7);
+        transform: scale(1.04);
+    }
+}
+
+@keyframes krHeartBeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+}
+
+.kr-floating-follow-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.kr-float-social-btn {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #ffffff;
+    text-decoration: none;
+    transition: transform 0.18s ease, filter 0.18s ease;
+    flex-shrink: 0;
+}
+.kr-float-social-btn:hover {
+    transform: translateY(-2px) scale(1.1);
+    filter: brightness(1.12);
+}
+.kr-float-social-btn:active {
+    transform: scale(0.92);
+}
+
+.kr-float-social--fb { background: #1877f2; }
+.kr-float-social--ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.kr-float-social--x  { background: #000000; border: 1px solid rgba(255, 255, 255, 0.25); }
+.kr-float-social--tt { background: #010101; border: 1px solid rgba(255, 255, 255, 0.2); }
+.kr-float-social--yt { background: #ff0000; }
+.kr-float-social--wa { background: #25d366; }
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-    .kr-mobile-floating-follow {
-        display: block;
-        position: fixed;
-        bottom: 18px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 998;
-        max-width: calc(100vw - 32px);
-        pointer-events: auto;
-        animation: krFloatSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    .kr-floating-follow {
+        bottom: 16px;
     }
-    
     .kr-floating-follow-inner {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 6px 12px 6px 10px;
-        background: rgba(15, 23, 42, 0.88);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 100px;
-        box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    .kr-floating-follow-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-        color: #ffffff;
-        font-size: 11.5px;
-        font-weight: 800;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
-        padding: 5px 10px;
-        border-radius: 100px;
-        box-shadow: 0 2px 6px rgba(185, 28, 28, 0.4);
-        line-height: 1;
-        flex-shrink: 0;
-    }
-
-    .kr-floating-follow-icons {
-        display: flex;
-        align-items: center;
         gap: 6px;
+        padding: 5px 10px 5px 8px;
     }
-
+    .kr-floating-follow-label {
+        font-size: 11px;
+        padding: 5px 9px;
+    }
+    .kr-floating-follow-icons {
+        gap: 5px;
+    }
     .kr-float-social-btn {
-        display: grid;
-        place-items: center;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        color: #ffffff;
-        text-decoration: none;
-        transition: transform 0.15s ease, opacity 0.15s ease;
-        flex-shrink: 0;
+        width: 29px;
+        height: 29px;
     }
-    .kr-float-social-btn:active {
-        transform: scale(0.9);
-    }
-
-    .kr-float-social--fb { background: #1877f2; }
-    .kr-float-social--ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
-    .kr-float-social--x  { background: #000000; border: 1px solid rgba(255, 255, 255, 0.25); }
-    .kr-float-social--tt { background: #010101; border: 1px solid rgba(255, 255, 255, 0.2); }
-    .kr-float-social--yt { background: #ff0000; }
-    .kr-float-social--wa { background: #25d366; }
-
-    /* Agar rocket scroll-top tidak menabrak bar floating mobile */
     .kr-scroll-top {
         bottom: 74px !important;
         right: 14px !important;
@@ -5735,4 +5782,5 @@ html.dark .kr-reaction-toast {
         transform: translate(-50%, 0) scale(1);
     }
 }
+
 

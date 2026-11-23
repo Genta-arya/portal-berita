@@ -255,8 +255,8 @@
     </svg>
 </button>
 
-{{-- Floating Social Follow Bar di Mobile (Bawah Tengah) --}}
-<div class="kr-mobile-floating-follow" id="krMobileFloatingFollow" aria-label="Ikuti Media Sosial Kami">
+{{-- Floating Social Follow Bar (Bawah Tengah untuk Mobile & Desktop) --}}
+<div class="kr-floating-follow" id="krFloatingFollow" aria-label="Ikuti Media Sosial Kami">
     <div class="kr-floating-follow-inner">
         <span class="kr-floating-follow-label">
             <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden="true">
