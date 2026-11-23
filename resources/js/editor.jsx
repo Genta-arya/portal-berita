@@ -38,7 +38,77 @@ function Editor({initial,categories}) {
     j.s.save();const url=window.prompt('URL video YouTube');if(!url)return;
     try{const u=new URL(url);const id=u.hostname==='youtu.be'?u.pathname.slice(1):['youtube.com','www.youtube.com','www.youtube-nocookie.com'].includes(u.hostname)?(u.searchParams.get('v')??u.pathname.match(/^\/embed\/([A-Za-z0-9_-]{11})$/)?.[1]):null;if(!/^[A-Za-z0-9_-]{11}$/.test(id??''))throw new Error();j.s.restore();j.s.insertHTML(`<iframe src="https://www.youtube-nocookie.com/embed/${id}" width="560" height="315" title="Video YouTube"></iframe><p><br></p>`);}catch{setMessage('Masukkan URL YouTube yang valid.');}
   }},'table','|','eraser','find','fullsize','preview','source'];
-  const j=Jodit.make(host,{readonly:!initial.editable,height:500,minHeight:400,language:'en',sourceEditor:'area',spellcheck:true,toolbarAdaptive:false,toolbarSticky:true,buttons,controls:{paragraph:{list:{p:'Paragraph',h2:'Heading 2',h3:'Heading 3',blockquote:'Quote'}}},showCharsCounter:false,showWordsCounter:false,showXPathInStatusbar:false,askBeforePasteHTML:true,askBeforePasteFromWord:true,disablePlugins:['file','filebrowser','image','video','image-properties','drag-and-drop','drag-and-drop-element','paste-storage']});
+  const j=Jodit.make(host,{
+    readonly:!initial.editable,
+    height:500,
+    minHeight:400,
+    language:'en',
+    sourceEditor:'area',
+    spellcheck:true,
+    toolbarAdaptive:false,
+    toolbarSticky:true,
+    buttons,
+    controls:{paragraph:{list:{p:'Paragraph',h2:'Heading 2',h3:'Heading 3',blockquote:'Quote'}}},
+    showCharsCounter:false,
+    showWordsCounter:false,
+    showXPathInStatusbar:false,
+    askBeforePasteHTML:true,
+    askBeforePasteFromWord:true,
+    resizer:{
+      showSize:true,
+      hideSizeTimeout:1000,
+      forImageChangeAttributes:true,
+      min_width:50,
+      min_height:50
+    },
+    popup:{
+      img:[
+        {
+          name:'align',
+          icon:'left',
+          list:['Left','Center','Right','Normal'],
+          tooltip:'Rata kiri / tengah / kanan',
+          exec:(editor,image,{control})=>{
+            const align=(control.args?.[0]||'').toLowerCase();
+            if(!image)return;
+            if(align==='center'){
+              image.style.display='block';
+              image.style.marginLeft='auto';
+              image.style.marginRight='auto';
+              image.style.float='none';
+            }else if(align==='left'){
+              image.style.display='inline-block';
+              image.style.float='left';
+              image.style.marginRight='16px';
+              image.style.marginBottom='10px';
+              image.style.marginLeft='0';
+            }else if(align==='right'){
+              image.style.display='inline-block';
+              image.style.float='right';
+              image.style.marginLeft='16px';
+              image.style.marginBottom='10px';
+              image.style.marginRight='0';
+            }else{
+              image.style.display='';
+              image.style.float='';
+              image.style.margin='';
+            }
+            editor.synchronizeValues();
+          }
+        },
+        '|',
+        {
+          name:'delete',
+          icon:'bin',
+          tooltip:'Hapus gambar',
+          exec:(editor,image)=>{
+            if(image)editor.s.removeNode(image);
+          }
+        }
+      ]
+    },
+    disablePlugins:['file','filebrowser','video','drag-and-drop','drag-and-drop-element','paste-storage']
+  });
   j.editor.setAttribute('aria-label','Isi berita');j.editor.setAttribute('role','textbox');j.editor.setAttribute('aria-multiline','true');
   let previous=j.value;
   const count=()=>setWords((j.editor.textContent??'').trim().split(/\s+/u).filter(Boolean).length);count();
