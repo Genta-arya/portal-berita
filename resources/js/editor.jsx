@@ -1,15 +1,7 @@
 import React, {useState,useRef,useEffect} from 'react';
 import {createRoot} from 'react-dom/client';
 import {Jodit} from 'jodit';
-import 'jodit/esm/plugins/fullsize/fullsize.js';
-import 'jodit/esm/plugins/preview/preview.js';
-import 'jodit/esm/plugins/search/search.js';
-import 'jodit/esm/plugins/source/source.js';
-import 'jodit/esm/plugins/clean-html/clean-html.js';
-import 'jodit/esm/plugins/paste/paste.js';
-import 'jodit/esm/plugins/paste-from-word/paste-from-word.js';
-import 'jodit/esm/plugins/justify/justify.js';
-import 'jodit/esm/plugins/video/config.js';
+import 'jodit/esm/plugins/all.js';
 import 'jodit/es2021/jodit.min.css';
 
 function Editor({initial,categories}) {
@@ -58,8 +50,8 @@ function Editor({initial,categories}) {
       showSize:true,
       hideSizeTimeout:1000,
       forImageChangeAttributes:true,
-      min_width:50,
-      min_height:50
+      min_width:30,
+      min_height:30
     },
     popup:{
       img:[
@@ -89,11 +81,21 @@ function Editor({initial,categories}) {
               image.style.marginBottom='10px';
               image.style.marginRight='0';
             }else{
-              image.style.display='';
-              image.style.float='';
-              image.style.margin='';
+              image.style.display='block';
+              image.style.float='none';
+              image.style.margin='14px auto';
             }
             editor.synchronizeValues();
+            editor.events.fire('recalcPositionPopup');
+          }
+        },
+        '|',
+        {
+          name:'edit',
+          icon:'pencil',
+          tooltip:'Pengaturan gambar',
+          exec:(editor,image)=>{
+            if(image)editor.events.fire('openImageProperties',image);
           }
         },
         '|',

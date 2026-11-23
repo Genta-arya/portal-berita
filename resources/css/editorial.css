@@ -2056,6 +2056,16 @@
 .reader .reading .prose p { line-height: 1.8; }
 .reader .reading .prose table { display: block; max-width: 100%; overflow-x: auto; }
 .reader .reading .prose iframe { max-width: 100%; }
+.reader .reading .prose img { max-width: 100%; height: auto; border-radius: 6px; }
+.reader .reading .prose img[style*="float: left"],
+.reader .reading .prose img[style*="float:left"] { display: inline-block !important; float: left; margin: 0 16px 14px 0 !important; }
+.reader .reading .prose img[style*="float: right"],
+.reader .reading .prose img[style*="float:right"] { display: inline-block !important; float: right; margin: 0 0 14px 16px !important; }
+.reader .reading .prose img[style*="margin-left: auto"],
+.reader .reading .prose img[style*="margin-left:auto"],
+.reader .reading .prose img[style*="margin: auto"],
+.reader .reading .prose img[style*="margin:auto"] { display: block !important; margin: 16px auto !important; float: none !important; }
+.reader .reading .prose::after { content: ""; display: table; clear: both; }
 .reader .reading .share { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; }
 .reader .reading .share :is(a, button) { font-size: 13px; font-weight: 700; background: var(--wash); color: var(--forest); border-radius: 100px; padding: 5px 10px; }
 .reader .reading .reading-badge-wrap {
