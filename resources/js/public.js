@@ -315,9 +315,12 @@ if (storyDialog) {
         storyIndex = nextIndex;
         render();
     }
+    let isPaused = false;
     function tick(now) {
         if (!storyDialog.open) return;
-        if (last && !reducedMotion.matches && !document.hidden && !imageLoading) elapsed += Math.min(now - last, 250);
+        if (last && !reducedMotion.matches && !document.hidden && !imageLoading && !isPaused) {
+            elapsed += Math.min(now - last, 250);
+        }
         last = now;
         const fill = progress.children[storyIndex]?.firstChild;
         if (fill) fill.style.transform = `scaleX(${Math.min(elapsed / duration, 1)})`;
@@ -333,6 +336,7 @@ if (storyDialog) {
             const index = topics.findIndex(topic => String(topic.id) === link.dataset.storyTopic);
             if (index < 0 || !topics[index].articles.length) return;
             event.preventDefault(); opener = link; topicIndex = index; storyIndex = 0;
+            isPaused = false;
             previousOverflow = document.body.style.overflow;
             document.body.style.overflow = 'hidden';
             render(); storyDialog.showModal(); get('[data-story-close]').focus();
@@ -346,16 +350,46 @@ if (storyDialog) {
     storyDialog.addEventListener('keydown', event => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); move(event.key === 'ArrowRight' ? 1 : -1); }
     });
-    let touchStart;
-    get('.topic-stories-body').addEventListener('touchstart', event => { touchStart = event.touches[0].clientX; }, { passive: true });
-    get('.topic-stories-body').addEventListener('touchend', event => {
+    let touchStart, touchStartTime = 0;
+    const storyBody = get('.topic-stories-body');
+    
+    // Tap / Hold to pause in mobile
+    storyBody.addEventListener('touchstart', event => {
+        touchStart = event.touches[0].clientX;
+        touchStartTime = Date.now();
+        isPaused = true;
+    }, { passive: true });
+
+    storyBody.addEventListener('touchend', event => {
+        isPaused = false;
+        last = performance.now();
         if (touchStart == null) return;
+        const touchDuration = Date.now() - touchStartTime;
         const distance = event.changedTouches[0].clientX - touchStart;
-        if (Math.abs(distance) > 55) move(distance < 0 ? 1 : -1);
+        if (Math.abs(distance) > 55) {
+            move(distance < 0 ? 1 : -1);
+        } else if (touchDuration < 250 && Math.abs(distance) < 15) {
+            // Short tap: switch left or right half of the screen
+            const rect = storyBody.getBoundingClientRect();
+            const tapX = event.changedTouches[0].clientX - rect.left;
+            if (tapX < rect.width * 0.35) {
+                move(-1);
+            } else if (tapX > rect.width * 0.65) {
+                move(1);
+            }
+        }
         touchStart = null;
     }, { passive: true });
+
+    storyBody.addEventListener('touchcancel', () => {
+        isPaused = false;
+        last = performance.now();
+        touchStart = null;
+    }, { passive: true });
+
     storyDialog.addEventListener('close', () => {
         ++renderVersion;
+        isPaused = false;
         cancelAnimationFrame(frame); document.body.style.overflow = previousOverflow;
         opener?.focus();
     });

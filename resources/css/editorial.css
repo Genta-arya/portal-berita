@@ -395,13 +395,24 @@
 }
 .reader .topic-shelf {
     background: var(--paper);
-    border: 1px solid var(--line);
+    border: 1.5px solid rgba(220, 38, 38, 0.35);
     border-radius: 14px;
     padding: 16px 20px;
     margin-bottom: 24px;
     box-shadow: 0 4px 16px rgba(37, 51, 43, 0.04);
     position: relative;
     overflow: hidden;
+    animation: krTopicShelfPulse 3s ease-in-out infinite;
+}
+@keyframes krTopicShelfPulse {
+    0%, 100% {
+        border-color: rgba(220, 38, 38, 0.25);
+        box-shadow: 0 4px 16px rgba(37, 51, 43, 0.04), 0 0 0 0 rgba(220, 38, 38, 0);
+    }
+    50% {
+        border-color: rgba(239, 68, 68, 0.75);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.08), 0 0 16px rgba(239, 68, 68, 0.22);
+    }
 }
 .reader .topic-shelf-header {
     display: flex;
@@ -615,13 +626,22 @@
 .reader .topic-image-wrap {
     padding: 3px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(185, 28, 28, 0.2), rgba(220, 38, 38, 0.4));
+    background: linear-gradient(135deg, #f87171, #ef4444, #b91c1c);
     display: inline-flex;
     transition: transform 0.2s ease;
+    animation: krRingPulse 2s ease-in-out infinite;
+}
+@keyframes krRingPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+    }
 }
 .reader .topic-link:hover .topic-image-wrap {
     background: linear-gradient(135deg, #b91c1c, #f87171);
-    transform: scale(1.05);
+    transform: scale(1.06);
 }
 .reader .topic-image {
     display: grid;
