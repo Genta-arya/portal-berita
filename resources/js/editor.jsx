@@ -37,12 +37,49 @@ function Editor({initial,categories}) {
  useEffect(()=>{const warn=e=>{if(changed.current){e.preventDefault();e.returnValue='';}};window.addEventListener('beforeunload',warn);const timer=setInterval(()=>{if(changed.current&&['draft','needs_revision'].includes(initial.status))save(true);},30000);return()=>{clearInterval(timer);window.removeEventListener('beforeunload',warn);};},[]);
  useEffect(()=>{if(media.length)document.querySelector('[aria-label="Pilih gambar"]')?.scrollIntoView({behavior:'smooth',block:'center'});},[media.length]);
  const insertImage=m=>{if(mediaMode==='hero'){update('hero_media_id',m.id);update('hero_alt',m.alt??'');update('hero_credit',m.credit??'');update('hero_caption',m.caption??'');setMedia([]);return;}if(!editor)return;const wrapper=document.createElement('div'),p=document.createElement('p'),img=document.createElement('img'),caption=document.createElement('p');img.src=`/media/${m.id}/1280`;img.alt=m.alt??'';p.appendChild(img);caption.textContent=[m.caption,m.credit].filter(Boolean).join(' · ')||'Caption foto';wrapper.append(p,caption);editor.s.restore();editor.s.insertHTML(wrapper.innerHTML);setMedia([]);}; const field=(key,label,type='text')=><label>{label}{type==='textarea'?<textarea value={data[key]??''} onChange={e=>update(key,e.target.value)}/>:<input type={type} value={data[key]??''} onChange={e=>update(key,e.target.value)}/>}</label>;
+ const fileInputRef = useRef(null);
+ const uploadDirect = async (file) => {
+   if (!file) return;
+   setBusy(true);
+   setMessage('Mengunggah gambar...');
+   const formData = new FormData();
+   formData.append('image', file);
+   const autoAlt = (data.title || '').trim() || file.name.replace(/\.[^/.]+$/, "");
+   const autoCredit = (data.hero_credit || '').trim() || 'Redaksi';
+   formData.append('alt', autoAlt);
+   formData.append('credit', autoCredit);
+   try {
+     const res = await fetch('/admin/media', {
+       method: 'POST',
+       headers: {
+         'Accept': 'application/json',
+         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+       },
+       body: formData
+     });
+     if (!res.ok) {
+       const err = await res.json().catch(() => ({}));
+       throw new Error(Object.values(err.errors || {}).flat().join(' ') || err.message || 'Gagal mengunggah gambar.');
+     }
+     const uploaded = await res.json();
+     update('hero_media_id', uploaded.id);
+     update('hero_alt', autoAlt);
+     update('hero_credit', autoCredit);
+     setMessage('Gambar utama berhasil diunggah.');
+   } catch (err) {
+     setMessage(err.message);
+   } finally {
+     setBusy(false);
+     if (fileInputRef.current) fileInputRef.current.value = '';
+   }
+ };
+
  return <div className="newsroom-editor">
  <div className="editor-savebar"><span className={dirty?'save-state is-dirty':'save-state'} aria-live="polite"><i/>{message}</span><button type="button" onClick={()=>save(false)} disabled={!initial.editable||!dirty||busy}>{busy?'Menyimpan...':'Simpan perubahan'}</button></div>
  <div className="editor-grid"><div className="editor-canvas">
  <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Naskah berita</h2><p>Mulai dengan judul yang jelas dan cerita yang bermakna.</p></div></div><fieldset disabled={!initial.editable||busy}>{field('title','Judul artikel')}{field('summary','Ringkasan berita','textarea')}<label>Isi berita</label><div ref={mount} className="jodit-newsroom"/><div className="writing-stats"><span>{words.toLocaleString('id-ID')} kata</span><span>{Math.max(1,Math.ceil(words/200))} menit baca</span><span>Ctrl+B tebal &middot; Ctrl+I miring</span></div></fieldset></section>
  {media.length>0&&<section className="workspace-card editor-section" role="region" aria-label="Pilih gambar"><div className="section-intro"><h2>{mediaMode==='hero'?'Pilih gambar utama':'Sisipkan gambar'}</h2><button className="button-secondary" type="button" onClick={()=>setMedia([])}>Tutup</button></div><div className="media-picker">{media.map(m=><button className="media-choice" type="button" key={m.id} onClick={()=>insertImage(m)}><img src={`/media/${m.id}/480`} alt={m.alt}/><span>{m.name}</span></button>)}</div></section>}
- <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Gambar utama</h2><p>Gambar pembuka yang tampil bersama artikel.</p></div></div><fieldset disabled={!initial.editable||busy}><div className="editor-hero-picker">{data.hero_media_id?<img src={`/media/${data.hero_media_id}/480`} alt={data.hero_alt||''}/>:<span>Belum ada gambar utama</span>}<div><button type="button" className="button-secondary" onClick={()=>loadMedia('hero')}>Pilih dari pustaka media</button><a className="text-link" href="/admin/media" target="_blank" rel="noopener">Unggah gambar baru &rarr;</a></div></div><div className="form-grid">{field('hero_alt','Deskripsi gambar (alt)')}{field('hero_credit','Kredit / sumber')}{field('hero_caption','Caption gambar','textarea')}</div></fieldset></section>
+ <section className="workspace-card editor-section"><div className="section-intro"><div><h2>Gambar utama</h2><p>Gambar pembuka yang tampil bersama artikel.</p></div></div><fieldset disabled={!initial.editable||busy}><div className="editor-hero-picker">{data.hero_media_id?<img src={`/media/${data.hero_media_id}/480`} alt={data.hero_alt||''}/>:<span>Belum ada gambar utama</span>}<div style={{display:'flex',gap:'0.5rem',flexWrap:'wrap',alignItems:'center'}}><input type="file" ref={fileInputRef} accept="image/*" style={{display:'none'}} onChange={e=>uploadDirect(e.target.files?.[0])}/><button type="button" className="button" onClick={()=>fileInputRef.current?.click()}>+ Upload Gambar Langsung</button><button type="button" className="button-secondary" onClick={()=>loadMedia('hero')}>Pilih dari pustaka</button></div></div><div className="form-grid">{field('hero_alt','Deskripsi gambar (alt - otomatis dari judul)')}{field('hero_credit','Kredit / sumber (otomatis Redaksi)')}{field('hero_caption','Caption gambar (opsional)','textarea')}</div></fieldset></section>
  </div><aside className="editor-sidebar">
  <section className="workspace-card editor-section"><div className="section-intro"><h2>Detail artikel</h2></div><fieldset disabled={!initial.editable||busy}><label>Topik<select value={data.category_id??''} onChange={e=>update('category_id',e.target.value)}><option value="">Pilih topik</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>{field('tags','Tag') }<small className="field-hint">Pisahkan tag dengan koma.</small>{field('guest_author','Penulis tamu')}{field('slug','Slug artikel')}<label className="checkbox-label"><input type="checkbox" checked={!!data.sponsored} onChange={e=>update('sponsored',e.target.checked)}/> Artikel bersponsor</label></fieldset></section>
  <section className="workspace-card editor-section"><details className="editor-disclosure"><summary>Optimasi pencarian (SEO)</summary><fieldset disabled={!initial.editable||busy}>{field('seo_title','Judul SEO')}{field('seo_description','Deskripsi SEO','textarea')}</fieldset></details></section>

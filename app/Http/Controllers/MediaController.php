@@ -33,8 +33,10 @@ class MediaController extends Controller
 
     public function store(Request $r)
     {
-        $r->validate(['image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120|dimensions:max_width=8000,max_height=8000', 'alt' => 'required|string|max:255', 'credit' => 'required|string|max:255', 'caption' => 'nullable|string|max:1000']);
+        $r->validate(['image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120|dimensions:max_width=8000,max_height=8000', 'alt' => 'nullable|string|max:255', 'credit' => 'nullable|string|max:255', 'caption' => 'nullable|string|max:1000']);
         $file = $r->file('image');
+        $alt = $r->input('alt') ?: pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $credit = $r->input('credit') ?: 'Redaksi';
         $bytes = file_get_contents($file->getRealPath());
         $img = @imagecreatefromstring($bytes);
         abort_unless($img, 422, 'Gambar tidak dapat dibaca.');
@@ -56,10 +58,10 @@ class MediaController extends Controller
         }
         $original = $dir.'/original';
         Storage::disk('local')->put($original, $bytes);
-        $id = DB::table('media')->insertGetId(['user_id' => $r->user()->id, 'name' => $file->getClientOriginalName(), 'path' => $original, 'variants' => json_encode($variants), 'mime' => $file->getMimeType(), 'size' => $file->getSize(), 'width' => imagesx($img), 'height' => imagesy($img), 'alt' => $r->alt, 'credit' => $r->credit, 'caption' => $r->caption, 'created_at' => now(), 'updated_at' => now()]);
+        $id = DB::table('media')->insertGetId(['user_id' => $r->user()->id, 'name' => $file->getClientOriginalName(), 'path' => $original, 'variants' => json_encode($variants), 'mime' => $file->getMimeType(), 'size' => $file->getSize(), 'width' => imagesx($img), 'height' => imagesy($img), 'alt' => $alt, 'credit' => $credit, 'caption' => $r->caption, 'created_at' => now(), 'updated_at' => now()]);
         imagedestroy($img);
 
-        return $r->expectsJson() ? response()->json(['id' => $id], 201) : back()->with('success', 'Gambar diunggah. ID: '.$id);
+        return $r->expectsJson() ? response()->json(['id' => $id, 'name' => $file->getClientOriginalName(), 'alt' => $alt, 'credit' => $credit, 'caption' => $r->caption], 201) : back()->with('success', 'Gambar diunggah. ID: '.$id);
     }
 
     public function show(Request $r, int $media, string $variant, MediaService $service)

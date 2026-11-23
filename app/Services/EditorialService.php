@@ -22,6 +22,14 @@ class EditorialService
             abort_if($autosave && ! in_array($a->status, ['draft', 'needs_revision']), 403);
             $a->fill(collect($data)->except(['version', 'tags', 'note'])->all());
             $a->body = app(ContentSanitizer::class)->clean($data['body'] ?? '');
+            if ($a->hero_media_id) {
+                if (! trim($a->hero_alt ?? '')) {
+                    $a->hero_alt = mb_substr($a->title, 0, 255);
+                }
+                if (! trim($a->hero_credit ?? '')) {
+                    $a->hero_credit = 'Redaksi';
+                }
+            }
             if (in_array($a->status, ['approved', 'scheduled'])) {
                 $a->status = 'draft';
                 $a->approved_version = null;
@@ -69,14 +77,34 @@ class EditorialService
             if (! in_array($action, ['submit', 'due'])) {
                 abort_unless($actor && (new ArticlePolicy)->manage($actor), 403);
             }
-            $allowed = ['submit' => ['draft', 'needs_revision'], 'revise' => ['in_review'], 'approve' => ['in_review'], 'publish' => ['approved'], 'schedule' => ['approved'], 'cancel' => ['scheduled'], 'due' => ['scheduled'], 'withdraw' => ['published'], 'reopen' => ['withdrawn']];
+            $isPrivileged = $actor && in_array($actor->role, ['developer', 'admin']);
+            $allowed = [
+                'submit' => ['draft', 'needs_revision'],
+                'revise' => ['in_review'],
+                'approve' => ['in_review'],
+                'publish' => $isPrivileged ? ['draft', 'needs_revision', 'in_review', 'approved'] : ['approved'],
+                'schedule' => $isPrivileged ? ['draft', 'needs_revision', 'in_review', 'approved'] : ['approved'],
+                'cancel' => ['scheduled'],
+                'due' => ['scheduled'],
+                'withdraw' => ['published'],
+                'reopen' => ['withdrawn']
+            ];
             abort_unless(isset($allowed[$action]) && in_array($a->status, $allowed[$action]), 422, 'Transisi tidak diizinkan.');
             if (in_array($action, ['revise', 'withdraw']) && ! trim($note ?? '')) {
                 throw ValidationException::withMessages(['note' => 'Catatan wajib diisi.']);
             }
             if (in_array($action, ['publish', 'schedule', 'due'])) {
+                // Auto-fill hero_alt and hero_credit from title/default if missing
+                if (! trim($a->hero_alt ?? '')) {
+                    $a->hero_alt = mb_substr($a->title, 0, 255);
+                }
+                if (! trim($a->hero_credit ?? '')) {
+                    $a->hero_credit = 'Redaksi';
+                }
                 $this->validatePublication($a);
-                abort_unless($a->approved_version === $a->version, 422, 'Versi belum disetujui.');
+                if (! $isPrivileged) {
+                    abort_unless($a->approved_version === $a->version, 422, 'Versi belum disetujui.');
+                }
             }
             if ($action === 'due') {
                 abort_unless($a->scheduled_at && $a->scheduled_at->lte(now()), 422);
@@ -91,7 +119,7 @@ class EditorialService
             $a->status = match ($action) {
                 'submit' => 'in_review','revise' => 'needs_revision','approve','cancel' => 'approved','schedule' => 'scheduled','publish','due' => 'published','withdraw' => 'withdrawn','reopen' => 'draft'
             };
-            if ($action === 'approve') {
+            if ($action === 'approve' || ($isPrivileged && in_array($action, ['publish', 'schedule']))) {
                 $a->editor_id = $actor->id;
                 $a->approved_version = $a->version;
             }
@@ -111,7 +139,7 @@ class EditorialService
             }
             // Workflow changes invalidate stale forms while keeping approval tied to the new version.
             $a->version++;
-            if (in_array($action, ['approve', 'schedule', 'cancel'])) {
+            if (in_array($action, ['approve', 'schedule', 'cancel']) || ($isPrivileged && $action === 'publish')) {
                 $a->approved_version = $a->version;
             }
             $a->save();
@@ -130,9 +158,9 @@ class EditorialService
     public function validatePublication(Article $a): void
     {
         $valid = trim($a->title) && trim($a->slug) && trim($a->summary ?? '') && mb_strlen(trim(strip_tags($a->body ?? ''))) >= 20
-            && $a->category?->active && $a->author && $a->hero_media_id && trim($a->hero_alt ?? '') && trim($a->hero_credit ?? '');
+            && $a->category?->active && $a->author && $a->hero_media_id;
         if (! $valid) {
-            throw ValidationException::withMessages(['article' => 'Lengkapi judul, ringkasan, isi (20 karakter), kanal aktif, gambar utama, alt dan kredit.']);
+            throw ValidationException::withMessages(['article' => 'Lengkapi judul, ringkasan, isi (minimal 20 karakter), topik aktif, dan gambar utama.']);
         }
     }
 
