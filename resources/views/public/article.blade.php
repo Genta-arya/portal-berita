@@ -135,19 +135,6 @@
             {{-- Redesign Statistik Berita di Bawah Gambar (Pill Cards Modern) --}}
             <div class="kr-article-engagement-bar" aria-label="Statistik dan Interaksi Artikel">
                 <div class="kr-engagement-stats">
-                    <div class="kr-engagement-pill kr-engagement-pill--views" title="Jumlah Pembaca">
-                        <span class="kr-pill-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </span>
-                        <div class="kr-pill-data">
-                            <strong class="kr-pill-number" id="krStatViews">{{ number_format($totalViews ?? 0, 0, ',', '.') }}</strong>
-                            <span class="kr-pill-text">Views</span>
-                        </div>
-                    </div>
-
                     <a href="#comments" class="kr-engagement-pill kr-engagement-pill--comments" title="Lihat Komentar">
                         <span class="kr-pill-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
