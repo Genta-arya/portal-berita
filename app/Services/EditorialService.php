@@ -22,6 +22,12 @@ class EditorialService
             abort_if($autosave && ! in_array($a->status, ['draft', 'needs_revision']), 403);
             $a->fill(collect($data)->except(['version', 'tags', 'note'])->all());
             $a->body = app(ContentSanitizer::class)->clean($data['body'] ?? '');
+            if (! trim($a->seo_title ?? '')) {
+                $a->seo_title = mb_substr($a->title, 0, 255);
+            }
+            if (! trim($a->seo_description ?? '')) {
+                $a->seo_description = mb_substr($a->summary ?? '', 0, 500);
+            }
             if ($a->hero_media_id) {
                 if (! trim($a->hero_alt ?? '')) {
                     $a->hero_alt = mb_substr($a->title, 0, 255);

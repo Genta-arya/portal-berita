@@ -15,7 +15,22 @@ import 'jodit/es2021/jodit.min.css';
 function Editor({initial,categories}) {
  const [data,setData]=useState(initial),[message,setMessage]=useState('Belum ada perubahan'),[dirty,setDirty]=useState(false),[media,setMedia]=useState([]),[busy,setBusy]=useState(false),[editor,setEditor]=useState(null),[words,setWords]=useState(0),[mediaMode,setMediaMode]=useState('body');
  const mount=useRef(null),current=useRef(initial),changed=useRef(false),saving=useRef(false),selection=useRef(0);
- const update=(key,value)=>{const next={...current.current,[key]:value};current.current=next;setData(next);changed.current=true;setDirty(true);};
+ const update=(key,value)=>{
+  const next={...current.current,[key]:value};
+  if (key === 'title') {
+    const val = value || '';
+    if (!current.current.seo_title || current.current.seo_title === current.current.title) {
+      next.seo_title = val;
+    }
+  }
+  if (key === 'summary') {
+    const val = value || '';
+    if (!current.current.seo_description || current.current.seo_description === current.current.summary) {
+      next.seo_description = val;
+    }
+  }
+  current.current=next;setData(next);changed.current=true;setDirty(true);
+ };
  const loadMedia=async(mode='body')=>{setMediaMode(mode);try{const r=await fetch('/admin/media',{headers:{Accept:'application/json'}});if(!r.ok)throw new Error();setMedia((await r.json()).data);}catch{setMessage('Media tidak dapat dimuat.');}};
  useEffect(()=>{
   const host=document.createElement('textarea');host.value=initial.body??'';mount.current.appendChild(host);
@@ -109,7 +124,7 @@ function Editor({initial,categories}) {
  </fieldset></section>
  </div><aside className="editor-sidebar">
  <section className="workspace-card editor-section"><div className="section-intro"><h2>Detail artikel</h2></div><fieldset disabled={!initial.editable||busy}><label>Topik<select value={data.category_id??''} onChange={e=>update('category_id',e.target.value)}><option value="">Pilih topik</option>{categories.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></label>{field('tags','Tag') }<small className="field-hint">Pisahkan tag dengan koma.</small>{field('guest_author','Penulis tamu')}{field('slug','Slug artikel')}<label className="checkbox-label"><input type="checkbox" checked={!!data.sponsored} onChange={e=>update('sponsored',e.target.checked)}/> Artikel bersponsor</label></fieldset></section>
- <section className="workspace-card editor-section"><details className="editor-disclosure"><summary>Optimasi pencarian (SEO)</summary><fieldset disabled={!initial.editable||busy}>{field('seo_title','Judul SEO')}{field('seo_description','Deskripsi SEO','textarea')}</fieldset></details></section>
+ <section className="workspace-card editor-section"><details className="editor-disclosure"><summary>Optimasi pencarian (SEO)</summary><fieldset disabled={!initial.editable||busy}>{field('seo_title','Judul SEO (otomatis dari judul)')}{field('seo_description','Deskripsi SEO (otomatis dari ringkasan)','textarea')}</fieldset></details></section>
  <section className="workspace-card editor-section editor-checklist"><h2>Kesiapan naskah</h2><ul>{[[data.title,'Judul artikel'],[data.summary,'Ringkasan'],[data.category_id,'Topik'],[words>0,'Isi berita'],[data.hero_media_id,'Gambar utama'],[data.hero_alt&&data.hero_credit,'Alt dan sumber foto']].map(([complete,label])=><li key={label} className={complete?'is-complete':''}><span aria-hidden="true">{complete?'✓':'○'}</span>{label}</li>)}</ul><p>Draft dan revisi disimpan otomatis setiap 30 detik.</p></section>
  </aside></div></div>;
 }
